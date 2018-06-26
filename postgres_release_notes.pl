@@ -266,9 +266,6 @@ for my $row (@pagelist) {
 	## Remove mailtos
 	$data =~ s{<a href=\s*"mailto:.+?">(.+?)</a>}{$1}gs;
 
-	## Put Postgres in the version title (no longer there!)
-	## $data =~ s{Release (\S+)}{Postgres version $1};
-
 	## Drop the headers down a level
 	$data =~ s{<h4}{<h5}sg;	$data =~ s{</h4>}{</h5>}sg;
 	$data =~ s{<h3}{<h4}sg;	$data =~ s{</h3>}{</h4>}sg;
