@@ -426,7 +426,7 @@ Zeugswetter Andres : Andreas Zeugswetter
 		$names += $count;
 	}
 	## Gregs:
-	for my $string ("8601 format", "always use pager", "conforming", "nonstandard ports") {
+	for my $string ("8601 format", "use pager", "conforming", "nonstandard ports") {
 		$names += $data =~ s/\Q$string\E\s+\(Greg\)/$string (Greg Sabino Mullane)/;
 	}
 	for my $string ("for large values)", "unnecessarily") {
