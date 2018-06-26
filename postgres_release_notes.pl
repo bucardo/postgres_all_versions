@@ -50,6 +50,7 @@ print {$fh} qq{<html>
 span.gsm_v { color: #990000; font-family: monospace;}
 span.gsm_nowrap { white-space: nowrap;}
 table td.eol { color: #111111; font-size: smaller; }
+table.gsm td { padding: 0.3em 0.5em 0.5em 0.5em }
 span.eol { color: #dd0000 }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
@@ -118,7 +119,7 @@ print qq{
 
 
 ## Table of Contents
-print "<table border=1>\n";
+print "<table class='gsm' border=1>\n";
 my $COLS = 6;
 my $startrow=1;
 my $startcell=1;
