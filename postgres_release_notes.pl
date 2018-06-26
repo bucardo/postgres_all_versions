@@ -120,7 +120,7 @@ print qq{
 
 ## Table of Contents
 print "<table class='gsm' border=1>\n";
-my $COLS = 6;
+my $COLS = 9;
 my $startrow=1;
 my $startcell=1;
 my $oldmajor = 0;
@@ -130,6 +130,8 @@ my $revision = 0;
 my $seeneol = 0;
 my $oldfirstnum = 10;
 my %version_is_eol;
+my $cols_done = 0;
+my $oldversion = 0;
 for my $row (@pagelist) {
 	my ($page,$title,$url,$version,$data) = @$row;
     my $major = 0;
@@ -166,24 +168,39 @@ for my $row (@pagelist) {
         }
     }
 
+
+    ## Special handling for version 6 and older
+    if ($firstnum <= 6) {
+        if ($version eq '6.5.3') {
+            print qq{</td><td colspan='3' valign=top class="eol"><b>Postgres 6 and older<br><span class="eol">(end of life)</span></b>\n};
+        }
+        printf qq{<br>%s<span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
+            ($oldversion =~ /^\d+\.\d+$/ and $version =~ /\d+\.\d+\.\d+/) ? ' ' : '',
+                $version,
+                ($revision>=1 ? $version : qq{<b>$version</b>}),
+                    $versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
+        $oldversion = $version;
+        next;
+    }
+
     ## Are we at the start of a row, or at the start of a cell?
     my ($startrow,$startcell) = (0,0);
 
     ## Store EOL flag for later
     $version_is_eol{$version} = $major <= $EOL ? 1 : 0;
 
-    ## We start a new row for EOL, and for first-number change
+    ## We start a new row for EOL, and for specific versions
     if (!$seeneol and $major <= $EOL) {
         $seeneol = 1;
         $startrow = 1;
         $oldfirstnum = $firstnum;
     }
-    elsif ($seeneol and $oldfirstnum != $firstnum and $firstnum >= 6) {
+    elsif ($version eq '7.4.30') {
         $oldfirstnum = $firstnum;
         $startrow = 1;
     }
 
-    ## We start a new row if the major has changed, except for super-old stuff
+    ## We start a new cell if the major has changed, except for super-old stuff
     if ($startrow or $oldmajor != $major and $major >= 6) {
         $oldmajor = $major;
         $startcell = 1;
@@ -199,30 +216,23 @@ for my $row (@pagelist) {
 
     if ($startcell) {
         ## Close old cell if needed
-        if ($major != $highversion) {
+        if ($major != $highversion and $major > 6) {
             print "</td>\n";
+            $cols_done++;
         }
         my $showver = $major;
         my $span = 1;
         ## Last one before EOL
         if ($major eq $EOLPLUS) {
-            $span = 2;
+            $span = $COLS - $cols_done;
         }
-        elsif (9.0 == $major) {
-            $span = 4;
-        }
-        elsif (8.0 == $major or 7.0 == $major) {
-            $span = 2;
-        }
-        if ($major eq '6.0') {
-            $showver = '6.0<br>and earlier...';
-            $span = 3;
-        }
+
 		printf " <td colspan=%s valign=top%s><b>Postgres %s%s</b>\n",
             $span,
-                $seeneol ? ' class="eol"' : '',
-                    $showver,
-                        $major <= $EOL ? ' <br><span class="eol">(end of life)</span>' : '';
+            $seeneol ? ' class="eol"' : '',
+            $showver,
+            $major <= $EOL ? ' <br><span class="eol">(end of life)</span>' : '';
+
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
@@ -232,7 +242,7 @@ for my $row (@pagelist) {
 				$versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
 	$oldmajor = $major;
 }
-print "</table>";
+print "</td></tr></table>\n\n";
 print STDOUT "Highest version: $highversion (revision $highrevision)\n";
 
 my $names = 0;
