@@ -13,5 +13,5 @@ $ perl postgres_release_notes.pl
 
 # Author
 
-Greg Sabino-Mullane <greg@turnstep.com>
+Greg Sabino Mullane <greg@turnstep.com>
 
