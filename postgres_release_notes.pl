@@ -6,7 +6,7 @@ use LWP::UserAgent;
 use Data::Dumper;
 use Getopt::Long qw/ GetOptions /;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -398,32 +398,6 @@ Zeugswetter Andres : Andreas Zeugswetter
 
 };
 
-
-## RYAN! Ryan is Ryan Bradetich &lt;<A HREF="mailto:rbrad@hpb50023.boi.hp.com">
-## Ryan        : Ryan Kirkpatrick
-
-## alpha and solaris are Kirk
-## psql charlen is from Date:   Sun Mar 14 05:23:12 1999 +0000
-## psql show view is Date:   Mon Mar 15 02:18:37 1999 +0000
-## Gonna call them Ryan B.
-
-##Peter       : Peter Eisentraut
-##Peter       : Peter Mount
-
-## Clark (fix tutorial code) - unknown!
-## Keith - Parks I guess but no proof!
-## Todd- the system password file (Todd)
-##  Todd is Todd A. Brandys http://markmail.org/thread/mkq6by6r2sspnixm#query:+page:1+mid:mkq6by6r2sspnixm+state:results
-
-
-# Stefan Simkovics: http://www.postgresql.org/message-id/199901180007.TAA22295@candle.pha.pa.us
-# Heiko Lehmann: http://www.postgresql.org/message-id/Pine.LNX.4.21.0202221131420.13849-100000@lukas.fh-lausitz.de
-# Anand:  http://www.postgresql.org/message-id/3606A390.4C492BCF@bytekinc.com
-# Maurizio Cauci: http://www.postgresql.org/message-id/001b01c0bf6f$bcf19d40$7394fea9@maurizio
-
-## Paul ?
-
-
 	for (split /\n/ => $namelist) {
 		next if ! /\w/;
 		die "Invalid line: $_\n" if ! /^([A-Z][\w \?']+?)\s+:\s+([A-Z][\wé\.\-\' ]+?)(\s*:.+)?$/;
@@ -450,11 +424,6 @@ Zeugswetter Andres : Andreas Zeugswetter
 	for my $string ("for large values)", "unnecessarily") {
 		$names += $data =~ s/\Q$string\E\s+\(Greg([,\)])/$string (Greg Stark$1/;
 	}
-
-	## Fix all PostgreSQL to Postgres?! ;)
-
-	## Important things to link to
-	## Fails: $data =~ s{(pgcrypto)}{<a href="http://www.postgresql.org/docs/current/static/pgcrypto.html">$1</a>}g;
 
 	while ($data =~ m{[\(,]([A-Z]\w+)[,\)]}g) {
 		my $name = $1;
@@ -488,7 +457,6 @@ for (sort keys %fail) {
 	print STDOUT "$_: $fail{$_}\n";
 }
 warn "Total name misses: $totalfail\n";
-
 
 print STDOUT "Names changed: $names\n";
 
@@ -537,4 +505,3 @@ sub fetch_page {
 	return $data;
 
 } ## end of fetch_page
-
