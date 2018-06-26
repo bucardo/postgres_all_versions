@@ -437,9 +437,10 @@ Zeugswetter Andres : Andreas Zeugswetter
 		my $name = $1;
 		next if $name =~ /^SQL|WARN|ERROR|MVCC|OID|NUL|ZONE|EPOCH|GEQO|WAL|WIN|Window|Alpha|Apple|BC|PITR|TIME|BUFFER|GBK|UHC/;
 		next if $name =~ /^TM|PL|SSL|XID|V0|ANALYZE|CTE|CV|LRU|MAX|ORM|SJIS|CN|CSV|Czech|JOHAB|ISM|Also|BLOB/;
-		next if $name =~ /^Taiwan|Mips|However|Japan|Ukrain|Venezuela/;
+		next if $name =~ /^Taiwan|Mips|However|Japan|Ukrain|Venezuela|Altai|Kaliningrad/;
 		next if $name eq 'MauMau' or $name eq 'Fiji' or $name eq 'ViSolve';
-		next if $name eq 'Rumko' or $name eq 'Higepon';
+		next if $name eq 'Rumko' or $name eq 'Higepon' or $name eq 'Darwin';
+		next if $name eq 'Simplified' or $name eq 'RLS' or $name eq 'OS';
 		$fail{$name}++;
 		$totalfail++;
 	}
