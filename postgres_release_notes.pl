@@ -328,6 +328,7 @@ Bryan?      : Bryan Henderson
 Byron       : Byron Nikolaidis
 Christof    : Christof Petig
 Christopher : Christopher Kings-Lynne
+Clark       : Clark C. Evans
 Claudio     : Claudio Natoli
 Constantin  : Constantin Teodorescu
 Dan         : Dan McGuirk
