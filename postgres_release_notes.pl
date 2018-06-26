@@ -50,6 +50,7 @@ print {$fh} qq{<html>
 span.gsm_v { color: #990000; font-family: monospace;}
 span.gsm_nowrap { white-space: nowrap;}
 table td.eol { color: #111111; font-size: smaller; }
+table.gsm td { padding: 0.3em 0.5em 0.5em 0.5em }
 span.eol { color: #dd0000 }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
@@ -118,8 +119,8 @@ print qq{
 
 
 ## Table of Contents
-print "<table border=1>\n";
-my $COLS = 6;
+print "<table class='gsm' border=1>\n";
+my $COLS = 9;
 my $startrow=1;
 my $startcell=1;
 my $oldmajor = 0;
@@ -129,6 +130,8 @@ my $revision = 0;
 my $seeneol = 0;
 my $oldfirstnum = 10;
 my %version_is_eol;
+my $cols_done = 0;
+my $oldversion = 0;
 for my $row (@pagelist) {
 	my ($page,$title,$url,$version,$data) = @$row;
     my $major = 0;
@@ -165,24 +168,39 @@ for my $row (@pagelist) {
         }
     }
 
+
+    ## Special handling for version 6 and older
+    if ($firstnum <= 6) {
+        if ($version eq '6.5.3') {
+            print qq{</td><td colspan='3' valign=top class="eol"><b>Postgres 6 and older<br><span class="eol">(end of life)</span></b>\n};
+        }
+        printf qq{<br>%s<span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
+            ($oldversion =~ /^\d+\.\d+$/ and $version =~ /\d+\.\d+\.\d+/) ? ' ' : '',
+                $version,
+                ($revision>=1 ? $version : qq{<b>$version</b>}),
+                    $versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
+        $oldversion = $version;
+        next;
+    }
+
     ## Are we at the start of a row, or at the start of a cell?
     my ($startrow,$startcell) = (0,0);
 
     ## Store EOL flag for later
     $version_is_eol{$version} = $major <= $EOL ? 1 : 0;
 
-    ## We start a new row for EOL, and for first-number change
+    ## We start a new row for EOL, and for specific versions
     if (!$seeneol and $major <= $EOL) {
         $seeneol = 1;
         $startrow = 1;
         $oldfirstnum = $firstnum;
     }
-    elsif ($seeneol and $oldfirstnum != $firstnum and $firstnum >= 6) {
+    elsif ($version eq '7.4.30') {
         $oldfirstnum = $firstnum;
         $startrow = 1;
     }
 
-    ## We start a new row if the major has changed, except for super-old stuff
+    ## We start a new cell if the major has changed, except for super-old stuff
     if ($startrow or $oldmajor != $major and $major >= 6) {
         $oldmajor = $major;
         $startcell = 1;
@@ -198,30 +216,23 @@ for my $row (@pagelist) {
 
     if ($startcell) {
         ## Close old cell if needed
-        if ($major != $highversion) {
+        if ($major != $highversion and $major > 6) {
             print "</td>\n";
+            $cols_done++;
         }
         my $showver = $major;
         my $span = 1;
         ## Last one before EOL
         if ($major eq $EOLPLUS) {
-            $span = 2;
+            $span = $COLS - $cols_done;
         }
-        elsif (9.0 == $major) {
-            $span = 4;
-        }
-        elsif (8.0 == $major or 7.0 == $major) {
-            $span = 2;
-        }
-        if ($major eq '6.0') {
-            $showver = '6.0<br>and earlier...';
-            $span = 3;
-        }
+
 		printf " <td colspan=%s valign=top%s><b>Postgres %s%s</b>\n",
             $span,
-                $seeneol ? ' class="eol"' : '',
-                    $showver,
-                        $major <= $EOL ? ' <br><span class="eol">(end of life)</span>' : '';
+            $seeneol ? ' class="eol"' : '',
+            $showver,
+            $major <= $EOL ? ' <br><span class="eol">(end of life)</span>' : '';
+
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
@@ -231,7 +242,7 @@ for my $row (@pagelist) {
 				$versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
 	$oldmajor = $major;
 }
-print "</table>";
+print "</td></tr></table>\n\n";
 print STDOUT "Highest version: $highversion (revision $highrevision)\n";
 
 my $names = 0;
@@ -265,9 +276,6 @@ for my $row (@pagelist) {
 
 	## Remove mailtos
 	$data =~ s{<a href=\s*"mailto:.+?">(.+?)</a>}{$1}gs;
-
-	## Put Postgres in the version title (no longer there!)
-	## $data =~ s{Release (\S+)}{Postgres version $1};
 
 	## Drop the headers down a level
 	$data =~ s{<h4}{<h5}sg;	$data =~ s{</h4>}{</h5>}sg;
@@ -418,7 +426,7 @@ Zeugswetter Andres : Andreas Zeugswetter
 		$names += $count;
 	}
 	## Gregs:
-	for my $string ("8601 format", "always use pager", "conforming", "nonstandard ports") {
+	for my $string ("8601 format", "use pager", "conforming", "nonstandard ports") {
 		$names += $data =~ s/\Q$string\E\s+\(Greg\)/$string (Greg Sabino Mullane)/;
 	}
 	for my $string ("for large values)", "unnecessarily") {
@@ -429,9 +437,10 @@ Zeugswetter Andres : Andreas Zeugswetter
 		my $name = $1;
 		next if $name =~ /^SQL|WARN|ERROR|MVCC|OID|NUL|ZONE|EPOCH|GEQO|WAL|WIN|Window|Alpha|Apple|BC|PITR|TIME|BUFFER|GBK|UHC/;
 		next if $name =~ /^TM|PL|SSL|XID|V0|ANALYZE|CTE|CV|LRU|MAX|ORM|SJIS|CN|CSV|Czech|JOHAB|ISM|Also|BLOB/;
-		next if $name =~ /^Taiwan|Mips|However|Japan|Ukrain|Venezuela/;
+		next if $name =~ /^Taiwan|Mips|However|Japan|Ukrain|Venezuela|Altai|Kaliningrad/;
 		next if $name eq 'MauMau' or $name eq 'Fiji' or $name eq 'ViSolve';
-		next if $name eq 'Rumko' or $name eq 'Higepon';
+		next if $name eq 'Rumko' or $name eq 'Higepon' or $name eq 'Darwin';
+		next if $name eq 'Simplified' or $name eq 'RLS' or $name eq 'OS';
 		$fail{$name}++;
 		$totalfail++;
 	}
