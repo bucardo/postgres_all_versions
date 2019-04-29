@@ -492,6 +492,16 @@ sub fetch_page {
 		mkdir $cachedir, 0700;
 	}
 
+    ## Special handling for Postgres website bug
+    if ($page =~ q{docs/current/static/release-(\d\-\d\-\d+)}) {
+        my $v = $1;
+        if ($v eq '8-1-23' or $v eq '8-0-26' or $v eq '7-4-30' or $v eq '7-3-21' or $v eq '7-2-8') {
+            ## 404 but it should not be, so we go to a known working version
+            $page = "https://www.postgresql.org/docs/8.2/release-$v.html";
+            $verbose and print "Replaced $v page with $page\n";
+        }
+    }
+
 	(my $safename = $page) =~ s{/}{_}g;
 	my $file = "$cachedir/$safename";
 
