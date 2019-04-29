@@ -90,12 +90,12 @@ while ($content =~ m{a href="(release.*?)">(.+?)</a>}gs) {
 	## Gather the release date for each version
 
     my $founddate = 0;
-    if ($pageinfo =~ /Release date:\D+(\d\d\d\d\-\d\d\-\d\d)/) {
+    if ($pageinfo =~ /Release [Dd]ate:\D+(\d\d\d\d\-\d\d\-\d\d)/) {
         $versiondate{$version} = $1;
         $verbose and warn "Found $version as $1\n";
         $founddate = 1;
     }
-    elsif ($pageinfo =~ m{Release date:.+(never released)}) {
+    elsif ($pageinfo =~ m{Release [Dd]ate:.+(never released)}) {
         $versiondate{$version} = $1;
         $verbose and warn "Version $version never released\n";
         $founddate = 1;
