@@ -1,11 +1,12 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -- -*-mode:cperl; indent-tabs-mode: nil-*-
 
 use strict;
 use warnings;
 use LWP::UserAgent;
+use HTTP::Request;
 use Data::Dumper;
 use Getopt::Long qw/ GetOptions /;
-use 5.8;
+use 5.8.0;
 
 our $VERSION = '1.17';
 
@@ -43,8 +44,8 @@ my $content = fetch_page($index);
 
 my $total = 0;
 my $bigpage = "$cachedir/postgres_all_versions.html";
-open my $fh, '>', $bigpage or die qq{Could not open "$bigpage": $!\n};
-print {$fh} qq{<html>
+open my $fh, '>', $bigpage or die qq{Could not open "$bigpage": $!\n}; ## no critic (InputOutput::RequireBriefOpen)
+print {$fh} q{<html>
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -130,8 +131,6 @@ print qq{
 ## Table of Contents
 print "<table class='gsm' border=1>\n";
 my $COLS = 9;
-my $startrow=1;
-my $startcell=1;
 my $oldmajor = 0;
 my $highversion = 1.0;
 my $highrevision = 0;
@@ -187,7 +186,7 @@ for my $row (@pagelist) {
             ($oldversion =~ /^\d+\.\d+$/ and $version =~ /\d+\.\d+\.\d+/) ? ' ' : '',
                 $version,
                 ($revision>=1 ? $version : qq{<b>$version</b>}),
-                    $versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
+                    $versiondate{$version} =~ /never/ ? '<em>never released!</em>' : "$versiondate{$version}";
         $oldversion = $version;
         next;
     }
@@ -248,7 +247,7 @@ for my $row (@pagelist) {
     printf qq{<br><span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
         $version,
             ($revision>=1 ? $version : qq{<b>$version</b>}),
-                $versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
+                $versiondate{$version} =~ /never/ ? '<em>never released!</em>' : "$versiondate{$version}";
     $oldmajor = $major;
 }
 print "</td></tr></table>\n\n";
@@ -436,10 +435,10 @@ Zeugswetter Andres : Andreas Zeugswetter
         $names += $count;
     }
     ## Gregs:
-    for my $string ("8601 format", "use pager", "conforming", "nonstandard ports") {
+    for my $string ('8601 format', 'use pager', 'conforming', 'nonstandard ports') {
         $names += $data =~ s/\Q$string\E\s+\(Greg\)/$string (Greg Sabino Mullane)/;
     }
-    for my $string ("for large values)", "unnecessarily") {
+    for my $string ('for large values)', 'unnecessarily') {
         $names += $data =~ s/\Q$string\E\s+\(Greg([,\)])/$string (Greg Stark$1/;
     }
 
@@ -514,7 +513,7 @@ sub fetch_page {
     if (-e $file and ! $skipcache) {
         $verbose and print "Using cached file $file\n";
         open my $fh, '<', $file or die qq{Could not open "$file": $!\n};
-        my $data; { local $/; $data = <$fh>; }
+        my $data; { local $/; $data = <$fh>; } ## no critic (Variables::RequireInitializationForLocalVars)
         close $fh;
         $last_cached_file = $file;
         return $data;
