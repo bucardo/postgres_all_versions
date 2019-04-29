@@ -65,47 +65,54 @@ my @pagelist;
 my %bullet;
 ## When it was released
 my %versiondate;
-## First run to gather version information
-while ($content =~ m{a href="(release.*?)">(.+?)</a>}gs) {
-	my ($page,$title) = ($1,$2);
-	$title =~ s/\s+/ /;
-	my $version = '?';
-	if ($title =~ s/.*(Release)\s+([\d\.]+)$/$1 $2/) {
-		$version = $2;
-	}
-	else {
-		die "No release found for page ($page) and title ($title)\n";
-	}
-	#print "GOT $page and $title\n";
-	(my $pageurl = $index) =~ s/release.html/$page/;
-	my $pageinfo = fetch_page($pageurl);
-	$total++;
 
-	push @pagelist => [$page, $title, $pageurl, $version, $pageinfo];
+## Newer versions do not have full information on old versions, so we simply scan everything
+my %seen_version;
 
-	while ($pageinfo =~ m{<li>\s*<p>(.+?)</li>}sg) {
-		my $blurb = $1;
-		push @{$bullet{$blurb}} => $version;
-	}
+while ($content =~ m{a href="/docs/([\d\.]+)/release.html"}gs) {
+    my $versionpage = "http://www.postgresql.org/docs/$1/release.html";
+    my $version_content = fetch_page($versionpage);
+    while ($version_content =~ m{<a href="(release\-[\d\-]+\.html)">[\w\. ]*(Release .+?)</a>}gs) {
+        my ($page,$title) = ($1,$2);
+        $title =~ s/\s+/ /;
+        my $version = '?';
+        if ($title =~ s/.*(Release)\s+([\d\.]+)$/$1 $2/) {
+            $version = $2;
+        }
+        else {
+            die "No release found for page ($page) and title ($title)\n";
+        }
+        next if $seen_version{$title}++;
+        $verbose and print "GOT $page and $title\n";
+        (my $pageurl = $index) =~ s/release.html/$page/;
+        my $pageinfo = fetch_page($pageurl);
+        $total++;
 
-	## Gather the release date for each version
+        push @pagelist => [$page, $title, $pageurl, $version, $pageinfo];
 
-    my $founddate = 0;
-    if ($pageinfo =~ /Release [Dd]ate:\D+(\d\d\d\d\-\d\d\-\d\d)/) {
-        $versiondate{$version} = $1;
-        $verbose and warn "Found $version as $1\n";
-        $founddate = 1;
-    }
-    elsif ($pageinfo =~ m{Release [Dd]ate:.+(never released)}) {
-        $versiondate{$version} = $1;
-        $verbose and warn "Version $version never released\n";
-        $founddate = 1;
-    }
-    if (!$founddate) {
-        die "No date found for version $title at page $page! ($last_cached_file)\n";
+        while ($pageinfo =~ m{<li>\s*<p>(.+?)</li>}sg) {
+            my $blurb = $1;
+            push @{$bullet{$blurb}} => $version;
+        }
+
+        ## Gather the release date for each version
+
+        my $founddate = 0;
+        if ($pageinfo =~ /Release [Dd]ate:\D+(\d\d\d\d\-\d\d\-\d\d)/) {
+            $versiondate{$version} = $1;
+            $verbose and warn "Found $version as $1\n";
+            $founddate = 1;
+        }
+        elsif ($pageinfo =~ m{Release [Dd]ate:.+(never released)}) {
+            $versiondate{$version} = $1;
+            $verbose and warn "Version $version never released\n";
+            $founddate = 1;
+        }
+        if (!$founddate) {
+            die "No date found for version $title at page $page! ($last_cached_file)\n";
+        }
     }
 }
-
 
 my $date = qx{date +"%B %d, %Y"};
 chomp $date;
