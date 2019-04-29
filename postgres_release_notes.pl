@@ -29,6 +29,7 @@ if ($opt{help}) {
 
 my $verbose = $opt{verbose} || 0;
 my $cachedir = '/tmp/cache';
+my $last_cached_file = '';
 my $index = 'http://www.postgresql.org/docs/current/static/release.html';
 my $baseurl = 'http://www.postgresql.org/docs/current/static';
 
@@ -101,7 +102,7 @@ while ($content =~ m{a href="(release.*?)">(.+?)</a>}gs) {
         $founddate = 1;
     }
     if (!$founddate) {
-        die "No date found for version $title at page $page!\n";
+        die "No date found for version $title at page $page! ($last_cached_file)\n";
     }
 }
 
@@ -497,6 +498,7 @@ sub fetch_page {
 		open my $fh, '<', $file or die qq{Could not open "$file": $!\n};
 		my $data; { local $/; $data = <$fh>; }
 		close $fh;
+        $last_cached_file = $file;
 		return $data;
 	}
 
