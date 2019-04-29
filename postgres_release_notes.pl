@@ -6,7 +6,7 @@ use LWP::UserAgent;
 use Data::Dumper;
 use Getopt::Long qw/ GetOptions /;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
