@@ -1,0 +1,45 @@
+verbose = 8
+severity = 1
+profile-strictness = quiet
+
+## Severity 4:
+[-Bangs::ProhibitDebuggingModules]
+[-ErrorHandling::RequireUseOfExceptions]
+[-InputOutput::ProhibitOneArgSelect]
+[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
+
+## Severity 3:
+[-Bangs::ProhibitVagueNames]
+[-CodeLayout::ProhibitHashBarewords]
+[-CodeLayout::RequireUseUTF8]
+[-ControlStructures::ProhibitCascadingIfElse]
+[-ErrorHandling::RequireCarping]
+[-InputOutput::ProhibitBacktickOperators]
+[-Modules::ProhibitExcessMainComplexity]
+[-RegularExpressions::ProhibitCaptureWithoutTest]
+[-RegularExpressions::ProhibitComplexRegexes]
+[-RegularExpressions::RequireExtendedFormatting]
+[-ValuesAndExpressions::ProhibitImplicitNewlines]
+[-ValuesAndExpressions::ProhibitVersionStrings]
+
+## Severity 2:
+[-InputOutput::RequireCheckedClose]
+[-Lax::ProhibitEmptyQuotes::ExceptAsFallback]
+[-References::ProhibitDoubleSigils]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Tics::ProhibitLongLines]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+[-ValuesAndExpressions::RequireConstantOnLeftSideOfEquality]
+[-ValuesAndExpressions::RestrictLongStrings]
+[-Variables::ProhibitPunctuationVars]
+
+## Severity 1:
+[-CodeLayout::RequireASCII]
+[-CodeLayout::RequireTidyCode]
+[-InputOutput::RequireBracedFileHandleWithPrint]
+[-InputOutput::RequireCheckedSyscalls]
+[-RegularExpressions::ProhibitEnumeratedClasses]
+[-RegularExpressions::ProhibitEscapedMetacharacters]
