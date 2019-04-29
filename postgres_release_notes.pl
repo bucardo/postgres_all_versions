@@ -11,8 +11,8 @@ our $VERSION = '1.17';
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
-my $EOL = '9.2';
-my $EOLPLUS = '9.3';
+my $EOL = '9.3';
+my $EOLPLUS = '9.4';
 
 my %opt;
 GetOptions(
