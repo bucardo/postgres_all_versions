@@ -142,7 +142,7 @@ my %version_is_eol;
 my $cols_done = 0;
 my $oldversion = 0;
 for my $row (@pagelist) {
-	my ($page,$title,$url,$version,$data) = @$row;
+    my ($page,$title,$url,$version,$data) = @$row;
     my $major = 0;
     my $firstnum = 0;
     ## Version is x.y or x.y.z or x or x.z
@@ -236,7 +236,7 @@ for my $row (@pagelist) {
             $span = $COLS - $cols_done;
         }
 
-		printf " <td colspan=%s valign=top%s><b>Postgres %s%s</b>\n",
+        printf " <td colspan=%s valign=top%s><b>Postgres %s%s</b>\n",
             $span,
             $seeneol ? ' class="eol"' : '',
             $showver,
@@ -245,11 +245,11 @@ for my $row (@pagelist) {
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
-	printf qq{<br><span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
-		$version,
-			($revision>=1 ? $version : qq{<b>$version</b>}),
-				$versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
-	$oldmajor = $major;
+    printf qq{<br><span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
+        $version,
+            ($revision>=1 ? $version : qq{<b>$version</b>}),
+                $versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
+    $oldmajor = $major;
 }
 print "</td></tr></table>\n\n";
 print STDOUT "Highest version: $highversion (revision $highrevision)\n";
@@ -261,64 +261,64 @@ my %fail;
 my $totalfail=0;
 
 for my $row (@pagelist) {
-	my ($page,$title,$url,$version,$data) = @$row;
+    my ($page,$title,$url,$version,$data) = @$row;
 
     ## Old style:
- 	$data =~ s{.*?(<div class="SECT1")}{$1}s;
-	$data =~ s{<div class="NAVFOOTER".+}{}s;
+     $data =~ s{.*?(<div class="SECT1")}{$1}s;
+    $data =~ s{<div class="NAVFOOTER".+}{}s;
 
     ## New as of version 10:
     $data =~ s{.*(<p><strong>Release date)}{$1}s;
-	$data =~ s{<div class="navfooter".+}{}s;
+    $data =~ s{<div class="navfooter".+}{}s;
 
-	## Add pretty version information for each bullet
-	$data =~ s{<li>\s*<p>(.+?)</li>}{
-		my $blurb = $1;
-		die "Mismatch blurb!!" if ! exists $bullet{$blurb};
-		my $pversion = join ',' => @{ $bullet{$blurb} };
-		die "Another version mismatch!\n" if $pversion !~ /\b$version\b/;
-		$pversion =~ s{(\b)$version,?}{$1};
-		$pversion = sprintf '<b>%s</b>%s%s', $version, ($pversion =~ /\d/ ? ',' : ''), $pversion;
-		$pversion =~ s/,$//;
-		"<li><p><span class='gsm_v'>($pversion) </span>$blurb</li>"
-	}sgex;
+    ## Add pretty version information for each bullet
+    $data =~ s{<li>\s*<p>(.+?)</li>}{
+        my $blurb = $1;
+        die "Mismatch blurb!!" if ! exists $bullet{$blurb};
+        my $pversion = join ',' => @{ $bullet{$blurb} };
+        die "Another version mismatch!\n" if $pversion !~ /\b$version\b/;
+        $pversion =~ s{(\b)$version,?}{$1};
+        $pversion = sprintf '<b>%s</b>%s%s', $version, ($pversion =~ /\d/ ? ',' : ''), $pversion;
+        $pversion =~ s/,$//;
+        "<li><p><span class='gsm_v'>($pversion) </span>$blurb</li>"
+    }sgex;
 
-	## Remove mailtos
-	$data =~ s{<a href=\s*"mailto:.+?">(.+?)</a>}{$1}gs;
+    ## Remove mailtos
+    $data =~ s{<a href=\s*"mailto:.+?">(.+?)</a>}{$1}gs;
 
-	## Drop the headers down a level
-	$data =~ s{<h4}{<h5}sg;	$data =~ s{</h4>}{</h5>}sg;
-	$data =~ s{<h3}{<h4}sg;	$data =~ s{</h3>}{</h4>}sg;
-	$data =~ s{<h2}{<h3}sg;	$data =~ s{</h2>}{</h3>}sg;
-	$data =~ s{<h1}{<h2}sg;	$data =~ s{</h1>}{</h2>}sg;
+    ## Drop the headers down a level
+    $data =~ s{<h4}{<h5}sg;    $data =~ s{</h4>}{</h5>}sg;
+    $data =~ s{<h3}{<h4}sg;    $data =~ s{</h3>}{</h4>}sg;
+    $data =~ s{<h2}{<h3}sg;    $data =~ s{</h2>}{</h3>}sg;
+    $data =~ s{<h1}{<h2}sg;    $data =~ s{</h1>}{</h2>}sg;
 
-	## Remove all the not important "E-dot" stuff
-	$data =~ s{>E\.[\d+\.]+\s*}{>}gsm;
+    ## Remove all the not important "E-dot" stuff
+    $data =~ s{>E\.[\d+\.]+\s*}{>}gsm;
 
-	## Add a header for quick jumping
-	print qq{<a name="version_$version"></a>\n};
+    ## Add a header for quick jumping
+    print qq{<a name="version_$version"></a>\n};
 
-	## Redirect internal version links
-	## <a href="release-9-3-5.html">Section E.4</a>
-	$data =~ s{href=\s*"release-([\d\-]+)\.html">Section.*?</a>}{
-		(my $ver = $1) =~ s/\-/./g;
-		qq{href="#version_$ver">Version $ver</a>}
-	}gmsex;
+    ## Redirect internal version links
+    ## <a href="release-9-3-5.html">Section E.4</a>
+    $data =~ s{href=\s*"release-([\d\-]+)\.html">Section.*?</a>}{
+        (my $ver = $1) =~ s/\-/./g;
+        qq{href="#version_$ver">Version $ver</a>}
+    }gmsex;
 
-	## Redirect simple links
-	## <a href="postgres-fdw.html"><span class=
-	$data =~ s{href=\s*"(.+?)"}{href="$baseurl/$1"}g;
+    ## Redirect simple links
+    ## <a href="postgres-fdw.html"><span class=
+    $data =~ s{href=\s*"(.+?)"}{href="$baseurl/$1"}g;
 
-	## LINK CVE notices
-	my $mitre = 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=';
-	my $redhat = 'https://access.redhat.com/security/cve';
+    ## LINK CVE notices
+    my $mitre = 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=';
+    my $redhat = 'https://access.redhat.com/security/cve';
 
-	$data =~ s{(CVE-[\d\-]+)}{<a href="$mitre$1">$1</a> or <a href="$redhat/$1">$1</a>}g;
+    $data =~ s{(CVE-[\d\-]+)}{<a href="$mitre$1">$1</a> or <a href="$redhat/$1">$1</a>}g;
 
-	## Put spaces before some parens
-	$data =~ s{(...\w)\(([A-Z]...)}{$1 ($2}g;
+    ## Put spaces before some parens
+    $data =~ s{(...\w)\(([A-Z]...)}{$1 ($2}g;
 
-	## Expand some names
+    ## Expand some names
 my $namelist = q{
 Adrian      : Adrian Hall
 Aldrin      : Aldrin Leal
@@ -416,44 +416,44 @@ Zeugswetter Andres : Andreas Zeugswetter
 
 };
 
-	for (split /\n/ => $namelist) {
-		next if ! /\w/;
-		die "Invalid line: $_\n" if ! /^([A-Z][\w \?']+?)\s+:\s+([A-Z][\wé\.\-\' ]+?)(\s*:.+)?$/;
-		my ($short,$long,$extra) = ($1,$2,$3||'');
-		my $count = 0;
-		$extra =~ s/^\s*:\s*//;
-		if ($extra) {
-			$extra = qr{$extra};
-			$count += $data =~ s{($extra[\w\d\.\(\) ]+?\([\w ,]*)\Q$short\E([,\)])}{$1$long$2}g;
-		}
-		else {
-			$count += $data =~ s{(\W)\Q$short\E([,\)])}{$1$long$2}g;
-			## Special case for Vadim &amp; Erich
-			$count += $data =~ s{\(\Q$short\E &amp;}{($long &amp;}g;
-			$count += $data =~ s{&amp; \Q$short\E\)}{(&amp; $long)}g;
-		}
-		$namesmatch{$short} += $count;
-		$names += $count;
-	}
-	## Gregs:
-	for my $string ("8601 format", "use pager", "conforming", "nonstandard ports") {
-		$names += $data =~ s/\Q$string\E\s+\(Greg\)/$string (Greg Sabino Mullane)/;
-	}
-	for my $string ("for large values)", "unnecessarily") {
-		$names += $data =~ s/\Q$string\E\s+\(Greg([,\)])/$string (Greg Stark$1/;
-	}
+    for (split /\n/ => $namelist) {
+        next if ! /\w/;
+        die "Invalid line: $_\n" if ! /^([A-Z][\w \?']+?)\s+:\s+([A-Z][\wé\.\-\' ]+?)(\s*:.+)?$/;
+        my ($short,$long,$extra) = ($1,$2,$3||'');
+        my $count = 0;
+        $extra =~ s/^\s*:\s*//;
+        if ($extra) {
+            $extra = qr{$extra};
+            $count += $data =~ s{($extra[\w\d\.\(\) ]+?\([\w ,]*)\Q$short\E([,\)])}{$1$long$2}g;
+        }
+        else {
+            $count += $data =~ s{(\W)\Q$short\E([,\)])}{$1$long$2}g;
+            ## Special case for Vadim &amp; Erich
+            $count += $data =~ s{\(\Q$short\E &amp;}{($long &amp;}g;
+            $count += $data =~ s{&amp; \Q$short\E\)}{(&amp; $long)}g;
+        }
+        $namesmatch{$short} += $count;
+        $names += $count;
+    }
+    ## Gregs:
+    for my $string ("8601 format", "use pager", "conforming", "nonstandard ports") {
+        $names += $data =~ s/\Q$string\E\s+\(Greg\)/$string (Greg Sabino Mullane)/;
+    }
+    for my $string ("for large values)", "unnecessarily") {
+        $names += $data =~ s/\Q$string\E\s+\(Greg([,\)])/$string (Greg Stark$1/;
+    }
 
-	while ($data =~ m{[\(,]([A-Z]\w+)[,\)]}g) {
-		my $name = $1;
-		next if $name =~ /^SQL|WARN|ERROR|MVCC|OID|NUL|ZONE|EPOCH|GEQO|WAL|WIN|Window|Alpha|Apple|BC|PITR|TIME|BUFFER|GBK|UHC/;
-		next if $name =~ /^TM|PL|SSL|XID|V0|ANALYZE|CTE|CV|LRU|MAX|ORM|SJIS|CN|CSV|Czech|JOHAB|ISM|Also|BLOB/;
-		next if $name =~ /^Taiwan|Mips|However|Japan|Ukrain|Venezuela|Altai|Kaliningrad/;
-		next if $name eq 'MauMau' or $name eq 'Fiji' or $name eq 'ViSolve';
-		next if $name eq 'Rumko' or $name eq 'Higepon' or $name eq 'Darwin';
-		next if $name eq 'Simplified' or $name eq 'RLS' or $name eq 'OS';
-		$fail{$name}++;
-		$totalfail++;
-	}
+    while ($data =~ m{[\(,]([A-Z]\w+)[,\)]}g) {
+        my $name = $1;
+        next if $name =~ /^SQL|WARN|ERROR|MVCC|OID|NUL|ZONE|EPOCH|GEQO|WAL|WIN|Window|Alpha|Apple|BC|PITR|TIME|BUFFER|GBK|UHC/;
+        next if $name =~ /^TM|PL|SSL|XID|V0|ANALYZE|CTE|CV|LRU|MAX|ORM|SJIS|CN|CSV|Czech|JOHAB|ISM|Also|BLOB/;
+        next if $name =~ /^Taiwan|Mips|However|Japan|Ukrain|Venezuela|Altai|Kaliningrad/;
+        next if $name eq 'MauMau' or $name eq 'Fiji' or $name eq 'ViSolve';
+        next if $name eq 'Rumko' or $name eq 'Higepon' or $name eq 'Darwin';
+        next if $name eq 'Simplified' or $name eq 'RLS' or $name eq 'OS';
+        $fail{$name}++;
+        $totalfail++;
+    }
 
     my $fullversion = $version;
 
@@ -462,18 +462,18 @@ Zeugswetter Andres : Andreas Zeugswetter
     }
     my $eol = $version_is_eol{$version} ? qq{ <span class="eol"><a href="$EOLURL">(end of life)</a></span>} : '';
     print "<h2>Postgres version $fullversion$eol</h2>\n";
-	print $data;
+    print $data;
 
 }
 
 for my $short (sort keys %namesmatch) {
-	next if $namesmatch{$short};
-	print STDOUT "NO MATCH FOR SHORTNAME $short!\n";
-	exit;
+    next if $namesmatch{$short};
+    print STDOUT "NO MATCH FOR SHORTNAME $short!\n";
+    exit;
 }
 
 for (sort keys %fail) {
-	print STDOUT "$_: $fail{$_}\n";
+    print STDOUT "$_: $fail{$_}\n";
 }
 warn "Total name misses: $totalfail\n";
 
@@ -487,11 +487,11 @@ print "Rewrote $bigpage\n";
 
 sub fetch_page {
 
-	my $page = shift or die "Need a page!\n";
+    my $page = shift or die "Need a page!\n";
 
-	if (! -d $cachedir) {
-		mkdir $cachedir, 0700;
-	}
+    if (! -d $cachedir) {
+        mkdir $cachedir, 0700;
+    }
 
     ## Special handling for Postgres website bug
     if ($page =~ q{docs/current/static/release-(\d\-\d\-\d+)}) {
@@ -503,35 +503,35 @@ sub fetch_page {
         }
     }
 
-	(my $safename = $page) =~ s{/}{_}g;
-	my $file = "$cachedir/$safename";
+    (my $safename = $page) =~ s{/}{_}g;
+    my $file = "$cachedir/$safename";
 
     my $skipcache = 0;
     if ($opt{nocache} or ($page =~ /release\.html/ and $opt{noindexcache})) {
         $skipcache = 1;
     }
 
-	if (-e $file and ! $skipcache) {
+    if (-e $file and ! $skipcache) {
         $verbose and print "Using cached file $file\n";
-		open my $fh, '<', $file or die qq{Could not open "$file": $!\n};
-		my $data; { local $/; $data = <$fh>; }
-		close $fh;
+        open my $fh, '<', $file or die qq{Could not open "$file": $!\n};
+        my $data; { local $/; $data = <$fh>; }
+        close $fh;
         $last_cached_file = $file;
-		return $data;
-	}
+        return $data;
+    }
 
     $verbose and print "Fetching file $file\n";
 
-	my $req = HTTP::Request->new(GET => $page);
-	my $res = $ua->request($req);
+    my $req = HTTP::Request->new(GET => $page);
+    my $res = $ua->request($req);
 
-	$res->is_success
-		or die "FAILED to fetch $page: " . $res->status_line . "\n";
+    $res->is_success
+        or die "FAILED to fetch $page: " . $res->status_line . "\n";
 
-	open my $fh, '>', $file or die qq{Could not write "$file": $!\n};
-	my $data = $res->content;
-	print {$fh} $data;
-	close $fh;
-	return $data;
+    open my $fh, '>', $file or die qq{Could not write "$file": $!\n};
+    my $data = $res->content;
+    print {$fh} $data;
+    close $fh;
+    return $data;
 
 } ## end of fetch_page
