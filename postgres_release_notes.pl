@@ -8,7 +8,7 @@ use Data::Dumper;
 use Getopt::Long qw/ GetOptions /;
 use 5.8.0;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -110,8 +110,13 @@ while ($content =~ m{a href="/docs/([\d\.]+)/release.html"}gs) {
             $verbose and warn "Version $version never released\n";
             $founddate = 1;
         }
+        elsif ($pageinfo =~ m{Release [Dd]ate:\D+\d\d\d\d\-\?}) {
+            $versiondate{$version} = 'future';
+            $founddate = 1;
+            $total--;
+        }
         if (!$founddate) {
-            die "No date found for version $title at page $page! ($last_cached_file)\n";
+            die "No date found for version $title at page $page! ($last_cached_file) ($pageinfo)\n";
         }
     }
 }
@@ -176,6 +181,9 @@ for my $row (@pagelist) {
         }
     }
 
+    ## Skip anything not yet released
+    next if $versiondate{$version} eq 'future';
+
 
     ## Special handling for version 6 and older
     if ($firstnum <= 6) {
@@ -203,7 +211,7 @@ for my $row (@pagelist) {
         $startrow = 1;
         $oldfirstnum = $firstnum;
     }
-    elsif ($version eq '7.4.30') {
+    elsif ($version eq '8.0.26') {
         $oldfirstnum = $firstnum;
         $startrow = 1;
     }
