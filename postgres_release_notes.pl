@@ -8,7 +8,7 @@ use Data::Dumper;
 use Getopt::Long qw/ GetOptions /;
 use 5.8.0;
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -51,9 +51,8 @@ print {$fh} q{<html>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <style><!--
 span.gsm_v { color: #990000; font-family: monospace;}
-span.gsm_nowrap { white-space: nowrap;}
 table td.eol { color: #111111; font-size: smaller; }
-table.gsm td { padding: 0.3em 0.5em 0.5em 0.5em }
+table.gsm td { white-space: nowrap; padding: 0.3em 0.5em 0.5em 0.5em }
 span.eol { color: #dd0000 }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
@@ -190,7 +189,7 @@ for my $row (@pagelist) {
         if ($version eq '6.5.3') {
             print qq{</td><td colspan='3' valign=top class="eol"><b>Postgres 6 and older<br><span class="eol">(end of life)</span></b>\n};
         }
-        printf qq{<br>%s<span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
+        printf qq{<br>%s<a href="#version_%s">%s</a> (%s)\n},
             ($oldversion =~ /^\d+\.\d+$/ and $version =~ /\d+\.\d+\.\d+/) ? ' ' : '',
                 $version,
                 ($revision>=1 ? $version : qq{<b>$version</b>}),
@@ -252,7 +251,7 @@ for my $row (@pagelist) {
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
-    printf qq{<br><span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
+    printf qq{<br><a href="#version_%s">%s</a> (%s)\n},
         $version,
             ($revision>=1 ? $version : qq{<b>$version</b>}),
                 $versiondate{$version} =~ /never/ ? '<em>never released!</em>' : "$versiondate{$version}";
@@ -271,7 +270,7 @@ for my $row (@pagelist) {
     my ($page,$title,$url,$version,$data) = @$row;
 
     ## Old style:
-     $data =~ s{.*?(<div class="SECT1")}{$1}s;
+    $data =~ s{.*?(<div class="SECT1")}{$1}s;
     $data =~ s{<div class="NAVFOOTER".+}{}s;
 
     ## New as of version 10:
@@ -293,14 +292,17 @@ for my $row (@pagelist) {
     ## Remove mailtos
     $data =~ s{<a href=\s*"mailto:.+?">(.+?)</a>}{$1}gs;
 
-    ## Drop the headers down a level
-    $data =~ s{<h4}{<h5}sg;    $data =~ s{</h4>}{</h5>}sg;
-    $data =~ s{<h3}{<h4}sg;    $data =~ s{</h3>}{</h4>}sg;
-    $data =~ s{<h2}{<h3}sg;    $data =~ s{</h2>}{</h3>}sg;
-    $data =~ s{<h1}{<h2}sg;    $data =~ s{</h1>}{</h2>}sg;
+    ## Adjust the headers a good bit
+    $data =~ s{<h2}{<h1}sg;    $data =~ s{</h2>}{</h1>}sg;
+    $data =~ s{<h3}{<h2}sg;    $data =~ s{</h3>}{</h2>}sg;
+    $data =~ s{<h4}{<h3}sg;    $data =~ s{</h4>}{</h3>}sg;
+    $data =~ s{<h[56]}{<h4}sg;    $data =~ s{</h[56]>}{</h4>}sg;
 
     ## Remove all the not important "E-dot" stuff
     $data =~ s{>E\.[\d+\.]+\s*}{>}gsm;
+
+    ## We are not using the existing CSS, so remove all classes
+    $data =~ s{ class="\w+"}{}sg;
 
     ## Add a header for quick jumping
     print qq{<a name="version_$version"></a>\n};
