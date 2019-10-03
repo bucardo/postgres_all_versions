@@ -304,6 +304,9 @@ for my $row (@pagelist) {
     ## We are not using the existing CSS, so remove all classes
     $data =~ s{ class="\w+"}{}sg;
 
+    ## For some reason, they use a complicated table to make a simple list. We can do better
+    $data =~ s{<table border="0" summary="Simple list">(.+?)</table>}{my $inner=$1; my $x=''; while ($inner =~ m!<td>(.+?)</td>!gs) { $x .= "<br>$1\n"; }; $x;}ges;
+
     ## Add a header for quick jumping
     print qq{<a name="version_$version"></a>\n};
 
