@@ -230,8 +230,6 @@ for my $row (@pagelist) {
 print "</table>\n";
 print STDOUT "Highest version: $highversion (revision $highrevision)\n";
 
-
-
 my $names = 0;
 my %namesmatch;
 my %fail;
@@ -275,6 +273,9 @@ for my $row (@pagelist) {
 
     ## We are not using the existing CSS, so remove all classes
     $data =~ s{ class="\w+"}{}sg;
+
+    ## Remove ids from the divs as we do not use those either
+    $data =~ s{<div.+?>}{<div>}g;
 
     ## Add a header for quick jumping
     print qq{<a id="version_$version"></a>\n};
