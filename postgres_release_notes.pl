@@ -32,7 +32,7 @@ if ($opt{help}) {
 my $verbose = $opt{verbose} || 0;
 my $cachedir = '/tmp/cache';
 my $last_cached_file = '';
-my $index = 'http://www.postgresql.org/docs/current/static/release.html';
+my $index = 'https://www.postgresql.org/docs/release/';
 my $baseurl = 'http://www.postgresql.org/docs/current/static';
 
 my $pagecache = {};
@@ -67,58 +67,45 @@ my %bullet;
 ## When it was released
 my %versiondate;
 
-## Newer versions do not have full information on old versions, so we simply scan everything
-my %seen_version;
+## First run to gather version information
 
-while ($content =~ m{a href="/docs/([\d\.]+)/release.html"}gs) {
-    my $versionpage = "http://www.postgresql.org/docs/$1/release.html";
-    my $version_content = fetch_page($versionpage);
-    while ($version_content =~ m{<a href="(release\-[\d\-]+\.html)">[\w\. ]*(Release .+?)</a>}gs) {
-        my ($page,$title) = ($1,$2);
-        $title =~ s/\s+/ /;
-        my $version = '?';
-        if ($title =~ s/.*(Release)\s+([\d\.]+)$/$1 $2/) {
-            $version = $2;
-        }
-        else {
-            die "No release found for page ($page) and title ($title)\n";
-        }
-        next if $seen_version{$title}++;
-        $verbose and print "GOT $page and $title\n";
-        (my $pageurl = $index) =~ s/release.html/$page/;
-        my $pageinfo = fetch_page($pageurl);
-        $total++;
+while ($content =~ m{a href="/docs/release/(\d[\d\.]+?)/"}gs) {
+    my $version = $1;
+    $verbose and warn "Found version $version\n";
+    my $pageurl = "$index$version/";
+	my $pageinfo = fetch_page($pageurl);
+	$total++;
 
-        push @pagelist => [$page, $title, $pageurl, $version, $pageinfo];
+	push @pagelist => [$pageurl, $version, $pageinfo];
 
-        while ($pageinfo =~ m{<li>\s*<p>(.+?)</li>}sg) {
-            my $blurb = $1;
-            push @{$bullet{$blurb}} => $version;
-        }
+	while ($pageinfo =~ m{<li>\s*<p>(.+?)</li>}sg) {
+		my $blurb = $1;
+		push @{$bullet{$blurb}} => $version;
+	}
 
-        ## Gather the release date for each version
+	## Gather the release date for each version
 
-        my $founddate = 0;
-        if ($pageinfo =~ /Release [Dd]ate:\D+(\d\d\d\d\-\d\d\-\d\d)/) {
-            $versiondate{$version} = $1;
-            $verbose and warn "Found $version as $1\n";
-            $founddate = 1;
-        }
-        elsif ($pageinfo =~ m{Release [Dd]ate:.+(never released)}) {
-            $versiondate{$version} = $1;
-            $verbose and warn "Version $version never released\n";
-            $founddate = 1;
-        }
-        elsif ($pageinfo =~ m{Release [Dd]ate:\D+\d\d\d\d\-\?}) {
-            $versiondate{$version} = 'future';
-            $founddate = 1;
-            $total--;
-        }
-        if (!$founddate) {
-            die "No date found for version $title at page $page! ($last_cached_file) ($pageinfo)\n";
-        }
+    my $founddate = 0;
+    if ($pageinfo =~ /Release [Dd]ate:\D+(\d\d\d\d\-\d\d\-\d\d)/) {
+        $versiondate{$version} = $1;
+        $verbose and warn "Found $version as $1\n";
+        $founddate = 1;
+    }
+    elsif ($pageinfo =~ m{Release [Dd]ate:.+(never released)}) {
+        $versiondate{$version} = $1;
+        $verbose and warn "Version $version never released\n";
+        $founddate = 1;
+    }
+    elsif ($pageinfo =~ m{Release [Dd]ate:\D+\d\d\d\d\-\?}) {
+        $versiondate{$version} = 'future';
+        $founddate = 1;
+        $total--;
+    }
+    if (!$founddate) {
+        die "No date found for version $version at page $pageurl!\n";
     }
 }
+
 
 my $date = qx{date +"%B %d, %Y"};
 chomp $date;
@@ -142,32 +129,30 @@ my $revision = 0;
 my $seeneol = 0;
 my $oldfirstnum = 10;
 my %version_is_eol;
-my $cols_done = 0;
-my $oldversion = 0;
+my $current_column = 0;
+
 for my $row (@pagelist) {
-    my ($page,$title,$url,$version,$data) = @$row;
+    my ($url,$version,$data) = @$row;
     my $major = 0;
-    my $firstnum = 0;
-    ## Version is x.y or x.y.z or x or x.z
-    if ($version =~ /^\d\d+$/) { ## Major version 10 or higher
-        $major = $firstnum = $version;
-        $revision = 0;
-    }
-    elsif ($version =~ /^(\d\d+)\.(\d+)$/) { ## Major version 10 or higher, plus revision
-        $major = $firstnum = $1;
-        $revision = $2;
-        $revision < 1 and die "Why is revision 0 of $version showing??";
-    }
-    elsif ($version =~ /^(\d)\.\d+$/) { ## Major version < 10
-        $firstnum = $1;
-        $major = $version;
-        $revision = 0;
-    }
-    elsif ($version =~ /^((\d)\.\d+)\.(\d+)$/) { ## Major version < 10, plus revision
+
+    $verbose > 2 and warn "Scanning version: $version\n";
+
+    ## Three formats we support, from newest to oldest
+
+    ## 10 and up: format is X.Z
+    if ($version =~ /^(\d\d+)\.(\d+)$/) {
         $major = $1;
-        $firstnum = $2;
-        $revision = $3;
-        $revision < 1 and die "Why is revision 0 of $version showing??";
+        $revision = $2;
+    }
+    ## 6.0.0 to 9.4.Z: X.Y.Z
+    elsif ($version =~ /^(\d\.\d+)\.(\d+)$/) {
+        $major = $1;
+        $revision = 2;
+    }
+    ## Ancient stuff: X.Y where X <= 1
+    elsif ($version =~ /^([01]\.\d\d?)$/) {
+        $major = $1;
+        $revision = 0;
     }
     else {
         die "Could not parse version '$version'";
@@ -183,42 +168,22 @@ for my $row (@pagelist) {
     ## Skip anything not yet released
     next if $versiondate{$version} eq 'future';
 
-
-    ## Special handling for version 6 and older
-    if ($firstnum <= 6) {
-        if ($version eq '6.5.3') {
-            print qq{</td><td colspan='3' valign=top class="eol"><b>Postgres 6 and older<br><span class="eol">(end of life)</span></b>\n};
-        }
-        printf qq{<br>%s<a href="#version_%s">%s</a> (%s)\n},
-            ($oldversion =~ /^\d+\.\d+$/ and $version =~ /\d+\.\d+\.\d+/) ? ' ' : '',
-                $version,
-                ($revision>=1 ? $version : qq{<b>$version</b>}),
-                    $versiondate{$version} =~ /never/ ? '<em>never released!</em>' : "$versiondate{$version}";
-        $oldversion = $version;
-        next;
-    }
-
     ## Are we at the start of a row, or at the start of a cell?
     my ($startrow,$startcell) = (0,0);
 
     ## Store EOL flag for later
     $version_is_eol{$version} = $major <= $EOL ? 1 : 0;
 
-    ## We start a new row for EOL, and for specific versions
-    if (!$seeneol and $major <= $EOL) {
-        $seeneol = 1;
-        $startrow = 1;
-        $oldfirstnum = $firstnum;
-    }
-    elsif ($version eq '8.0.26') {
-        $oldfirstnum = $firstnum;
-        $startrow = 1;
-    }
+    $startrow = 1 if ! defined $oldmajor;
 
-    ## We start a new cell if the major has changed, except for super-old stuff
-    if ($startrow or $oldmajor != $major and $major >= 6) {
+    if (! defined $oldmajor or $oldmajor != $major and $major >= 6) {
         $oldmajor = $major;
         $startcell = 1;
+        if (++$current_column > $COLS) {
+            $startrow = 1;
+            $current_column = 1;
+        }
+        $verbose > 2 and warn "Switched to version $version, startrow is $startrow, current cols is $current_column\n";
     }
 
     if ($startrow) {
@@ -231,33 +196,36 @@ for my $row (@pagelist) {
 
     if ($startcell) {
         ## Close old cell if needed
-        if ($major != $highversion and $major > 6) {
+        if ($major != $highversion and ! $startrow) {
             print "</td>\n";
-            $cols_done++;
         }
         my $showver = $major;
         my $span = 1;
         ## Last one before EOL
         if ($major eq $EOLPLUS) {
-            $span = $COLS - $cols_done;
+            $span = 2;
+            $current_column++;
         }
-
-        printf " <td colspan=%s valign=top%s><b>Postgres %s%s</b>\n",
+        if ($major eq '6.0') {
+            $showver = '6.0<br>and earlier...';
+            $span = 2;
+        }
+		printf " <td colspan=%s %s><b>Postgres %s%s</b>\n",
             $span,
-            $seeneol ? ' class="eol"' : '',
-            $showver,
-            $major <= $EOL ? ' <br><span class="eol">(end of life)</span>' : '';
-
+                $major <= $EOL ? ' class="eol"' : '',
+                    $showver,
+                        $major <= $EOL ? ' <br><span class="eol">(end of life)</span>' : '';
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
-    printf qq{<br><a href="#version_%s">%s</a> (%s)\n},
-        $version,
-            ($revision>=1 ? $version : qq{<b>$version</b>}),
-                $versiondate{$version} =~ /never/ ? '<em>never released!</em>' : "$versiondate{$version}";
-    $oldmajor = $major;
+	printf qq{<br><span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
+		$version,
+			($revision>=1 ? $version : qq{<b>$version</b>}),
+				$versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
+	$oldmajor = $major;
 }
-print "</td></tr></table>\n\n";
+
+print "</table>";
 print STDOUT "Highest version: $highversion (revision $highrevision)\n";
 
 my $names = 0;
@@ -267,7 +235,7 @@ my %fail;
 my $totalfail=0;
 
 for my $row (@pagelist) {
-    my ($page,$title,$url,$version,$data) = @$row;
+    my ($url,$version,$data) = @$row;
 
     ## Old style:
     $data =~ s{.*?(<div class="SECT1")}{$1}s;
@@ -303,9 +271,6 @@ for my $row (@pagelist) {
 
     ## We are not using the existing CSS, so remove all classes
     $data =~ s{ class="\w+"}{}sg;
-
-    ## For some reason, they use a complicated table to make a simple list. We can do better
-    $data =~ s{<table border="0" summary="Simple list">(.+?)</table>}{my $inner=$1; my $x=''; while ($inner =~ m!<td>(.+?)</td>!gs) { $x .= "<br>$1\n"; }; $x;}ges;
 
     ## Add a header for quick jumping
     print qq{<a name="version_$version"></a>\n};
