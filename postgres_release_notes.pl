@@ -306,7 +306,7 @@ for my $row (@pagelist) {
     $data =~ s{<li .+?>}{<li>}gsm;
 
     ## Make the list of names a simple list, not a table!
-    $data =~ s{<table [^>]+class="simplelist">(.+?)</table>}{
+    $data =~ s{<table [^>]+summary=(.+?)</table>}{
         my $inside = $1;
         my $list = "<ul>\n";
         while ($inside =~ m{<td>(.+?)</td>}g) {
