@@ -14,7 +14,7 @@ my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '9.3';
-my $EOLPLUS = '9.4';
+my $EOLPLUS = '9.4';  ## EOL February 13, 2010
 
 my %opt;
 GetOptions(
