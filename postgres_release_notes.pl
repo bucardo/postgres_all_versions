@@ -116,7 +116,7 @@ my $oldselect = select $fh;
 print qq{
 <h1>Postgres Changelog - All Versions</h1>
 
-<p>This is a complete, one-page listing of changes across all Postgres versions. All versions $EOL and older are EOL (<a href="$EOLURL">end of life</a>) and unsupported. This page was generated on $date and contains information for $total versions of Postgres. This is version $VERSION, and was created by Greg Sabino Mullane.</p>
+<p>This is a complete, one-page listing of changes across all Postgres versions. All versions $EOL and older are EOL (<a href="$EOLURL">end of life</a>) and unsupported. This page was generated on $date by a script (version $VERSION) by Greg Sabino Mullane, and contains information for $total versions of Postgres.</p>
 
 };
 
