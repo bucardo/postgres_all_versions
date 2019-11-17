@@ -31,7 +31,6 @@ if ($opt{help}) {
 
 my $verbose = $opt{verbose} || 0;
 my $cachedir = '/tmp/cache';
-my $last_cached_file = '';
 my $index = 'https://www.postgresql.org/docs/release/';
 my $baseurl = 'http://www.postgresql.org/docs/current/static';
 
@@ -525,7 +524,6 @@ sub fetch_page {
         open my $fh, '<', $file or die qq{Could not open "$file": $!\n};
         my $data; { local $/; $data = <$fh>; } ## no critic (Variables::RequireInitializationForLocalVars)
         close $fh;
-        $last_cached_file = $file;
         return $data;
     }
 
