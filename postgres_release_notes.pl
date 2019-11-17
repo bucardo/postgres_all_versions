@@ -8,7 +8,7 @@ use Data::Dumper;
 use Getopt::Long qw/ GetOptions /;
 use 5.8.0;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
