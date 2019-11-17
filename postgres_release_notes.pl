@@ -45,7 +45,8 @@ my $content = fetch_page($index);
 my $total = 0;
 my $bigpage = "$cachedir/postgres_all_versions.html";
 open my $fh, '>', $bigpage or die qq{Could not open "$bigpage": $!\n}; ## no critic (InputOutput::RequireBriefOpen)
-print {$fh} q{<html>
+print {$fh} qq{<!DOCTYPE html>
+<html lang='en'>
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
