@@ -541,6 +541,9 @@ sub fetch_page {
     my $data = $res->content;
     print {$fh} $data;
     close $fh;
+
+    $pagecache->{$page} = $file;
+
     return $data;
 
 } ## end of fetch_page
