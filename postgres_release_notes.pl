@@ -277,7 +277,7 @@ for my $row (@pagelist) {
     $data =~ s{ class="\w+"}{}sg;
 
     ## Add a header for quick jumping
-    print qq{<a name="version_$version"></a>\n};
+    print qq{<a id="version_$version"></a>\n};
 
     ## Redirect internal version links
     ## <a href="release-9-3-5.html">Section E.4</a>
