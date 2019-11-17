@@ -52,8 +52,10 @@ print {$fh} qq{<!DOCTYPE html>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <style><!--
 span.gsm_v { color: #990000; font-family: monospace;}
+span.gsm_nowrap { white-space: nowrap;}
+table { border-collapse: collapse; border-spacing: 15px }
+table td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top }
 table td.eol { color: #111111; font-size: smaller; }
-table.gsm td { white-space: nowrap; padding: 0.3em 0.5em 0.5em 0.5em }
 span.eol { color: #dd0000 }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
@@ -121,14 +123,15 @@ print qq{
 
 
 ## Table of Contents
-print "<table class='gsm' border=1>\n";
-my $COLS = 9;
-my $oldmajor = 0;
+print "<table>\n";
+my $COLS = 7;
+my $startrow=1;
+my $startcell=1;
+my $oldmajor;
 my $highversion = 1.0;
 my $highrevision = 0;
 my $revision = 0;
 my $seeneol = 0;
-my $oldfirstnum = 10;
 my %version_is_eol;
 my $current_column = 0;
 
@@ -211,7 +214,7 @@ for my $row (@pagelist) {
             $showver = '6.0<br>and earlier...';
             $span = 2;
         }
-		printf " <td colspan=%s %s><b>Postgres %s%s</b>\n",
+        printf " <td colspan=%s %s><b>Postgres %s%s</b>\n",
             $span,
                 $major <= $EOL ? ' class="eol"' : '',
                     $showver,
@@ -219,11 +222,11 @@ for my $row (@pagelist) {
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
-	printf qq{<br><span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
-		$version,
-			($revision>=1 ? $version : qq{<b>$version</b>}),
-				$versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
-	$oldmajor = $major;
+    printf qq{<br><span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
+        $version,
+            ($revision>=1 ? $version : qq{<b>$version</b>}),
+                $versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
+    $oldmajor = $major;
 }
 
 print "</table>";
