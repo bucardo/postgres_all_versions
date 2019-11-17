@@ -330,6 +330,34 @@ for my $row (@pagelist) {
     ## Put spaces before some parens
     $data =~ s{(...\w)\(([A-Z]...)}{$1 ($2}g;
 
+    ## Strip final </div> if it exists
+    $data =~ s{</div>\s*$}{};
+
+    ## Simplify lists
+    $data =~ s{<ul .+?>}{<ul>}gsm;
+    $data =~ s{<li .+?>}{<li>}gsm;
+
+    ## Make the list of names a simple list, not a table!
+    $data =~ s{<table [^>]+class="simplelist">(.+?)</table>}{
+        my $inside = $1;
+        my $list = "<ul>\n";
+        while ($inside =~ m{<td>(.+?)</td>}g) {
+            $list .= "<li>$1\n";
+        }
+        "$list</ul>\n";
+    }sex;
+
+    ## Remove "name" atribute if id already exists
+    $data =~ s{ name=".+?" id=}{ id=}g;
+
+    ## Replace acronym with abbr
+    $data =~ s{<acronym .+?>}{<abbr>}gsm;
+    $data =~ s{</acronym>}{</abbr>}g;
+
+    ## Replace tt with kbd
+    $data =~ s{<tt class=.+?">}{<kbd>}gsm;
+    $data =~ s{</tt>}{</kbd>}g;
+
     ## Expand some names
 my $namelist = q{
 Adrian      : Adrian Hall
