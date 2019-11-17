@@ -52,9 +52,9 @@ print {$fh} qq{<!DOCTYPE html>
 <style><!--
 span.gsm_v { color: #990000; font-family: monospace;}
 span.gsm_nowrap { white-space: nowrap;}
-table { border-collapse: collapse; border-spacing: 15px }
-table td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top }
-table td.eol { color: #111111; font-size: smaller; }
+table.gsm { border-collapse: collapse; border-spacing: 15px }
+table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top }
+table.gsm td.eol { color: #111111; font-size: smaller; }
 span.eol { color: #dd0000 }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
@@ -122,7 +122,7 @@ print qq{
 
 
 ## Table of Contents
-print "<table>\n";
+print "<table class='gsm'>\n";
 my $COLS = 7;
 my $startrow=1;
 my $startcell=1;
