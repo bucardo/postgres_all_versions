@@ -51,11 +51,10 @@ print {$fh} qq{<!DOCTYPE html>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <style><!--
 span.gsm_v { color: #990000; font-family: monospace;}
-span.gsm_nowrap { white-space: nowrap;}
 table.gsm { border-collapse: collapse; border-spacing: 15px }
-table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top }
+table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top; white-space: nowrap; }
 table.gsm td.eol { color: #111111; font-size: smaller; }
-span.eol { color: #dd0000 }
+table.gsm td.eol span { color: #dd0000 }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
 </head>
@@ -213,23 +212,25 @@ for my $row (@pagelist) {
             $showver = '6.0<br>and earlier...';
             $span = 2;
         }
-        printf " <td colspan=%s %s><b>Postgres %s%s</b>\n",
-            $span,
+        printf "<td%s%s><b>Postgres %s%s</b>\n",
+            $span > 1 ? " colspan=$span" : '',
                 $major <= $EOL ? ' class="eol"' : '',
                     $showver,
-                        $major <= $EOL ? ' <br><span class="eol">(end of life)</span>' : '';
+                        $major <= $EOL ? ' <br><span>(end of life)</span>' : '';
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
-    printf qq{<br><span class="gsm_nowrap"><a href="#version_%s">%s</a> (%s)</span>\n},
+    printf qq{<br><a href="#version_%s">%s</a> (%s)\n},
         $version,
             ($revision>=1 ? $version : qq{<b>$version</b>}),
                 $versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
     $oldmajor = $major;
 }
 
-print "</table>";
+print "</table>\n";
 print STDOUT "Highest version: $highversion (revision $highrevision)\n";
+
+
 
 my $names = 0;
 my %namesmatch;
