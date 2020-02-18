@@ -8,13 +8,13 @@ use Data::Dumper;
 use Getopt::Long qw/ GetOptions /;
 use 5.8.0;
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
-my $EOL = '9.3';
-my $EOLPLUS = '9.4';  ## EOL February 13, 2010
+my $EOL = '9.4';
+my $EOLPLUS = '9.5';  ## EOL February 11, 2021
 
 my %opt;
 GetOptions(
