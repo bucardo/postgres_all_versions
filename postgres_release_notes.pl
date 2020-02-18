@@ -205,13 +205,13 @@ for my $row (@pagelist) {
         my $showver = $major;
         my $span = 1;
         ## Last one before EOL
-        if ($major eq $EOLPLUS) {
-            $span = 2;
-            $current_column++;
+        if ($major eq  $EOLPLUS) {
+            $span = 3;
+            $current_column += 2;
         }
         if ($major eq '6.0') {
             $showver = '6.0<br>and earlier...';
-            $span = 2;
+            $span = 1;
         }
         printf "<td%s%s><b>Postgres %s%s</b>\n",
             $span > 1 ? " colspan=$span" : '',
