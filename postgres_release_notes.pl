@@ -326,7 +326,7 @@ for my $row (@pagelist) {
     $data =~ s{</acronym>}{</abbr>}g;
 
     ## Replace tt with kbd
-    $data =~ s{<tt class=.+?">}{<kbd>}gsm;
+    $data =~ s{<tt.*?>}{<kbd>}gsm;
     $data =~ s{</tt>}{</kbd>}g;
 
     ## Expand some names
