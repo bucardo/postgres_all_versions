@@ -472,7 +472,7 @@ Zeugswetter Andres : Andreas Zeugswetter
         $fullversion = "$version.0";
     }
     my $eol = $version_is_eol{$version} ? qq{ <span class="eol"><a href="$EOLURL">(end of life)</a></span>} : '';
-    print "<h2>Postgres version $fullversion$eol</h2>\n";
+    print "<h1>Postgres version $fullversion$eol</h1>\n";
     print $data;
 
 }
