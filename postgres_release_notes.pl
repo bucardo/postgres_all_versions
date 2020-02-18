@@ -278,9 +278,6 @@ for my $row (@pagelist) {
     ## We are not using the existing CSS, so remove all classes
     $data =~ s{ class="\w+"}{}sg;
 
-    ## Remove ids from the divs as we do not use those either
-    $data =~ s{<div.+?>}{<div>}g;
-
     ## Add a header for quick jumping
     print qq{<a id="version_$version"></a>\n};
 
@@ -304,9 +301,6 @@ for my $row (@pagelist) {
     ## Put spaces before some parens
     $data =~ s{(...\w)\(([A-Z]...)}{$1 ($2}g;
 
-    ## Strip final </div> if it exists
-    $data =~ s{</div>\s*$}{};
-
     ## Simplify lists
     $data =~ s{<ul .+?>}{<ul>}gsm;
     $data =~ s{<li .+?>}{<li>}gsm;
@@ -320,6 +314,9 @@ for my $row (@pagelist) {
         }
         "$list</ul>\n";
     }sex;
+
+    ## Remove all divs
+    $data =~ s{\s*</?div(.*?)>\s*}{}g;
 
     ## Remove "name" atribute if id already exists
     $data =~ s{ name=".+?" id=}{ id=}g;
