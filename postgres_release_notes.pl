@@ -23,6 +23,7 @@ GetOptions(
     'nocache',
     'verbose',
     'help',
+    'limitversions=s',
 );
 if ($opt{help}) {
     print "$USAGE\n";
@@ -237,7 +238,10 @@ my %fail;
 my $totalfail=0;
 
 for my $row (@pagelist) {
+
     my ($url,$version,$data) = @$row;
+
+    next if $opt{limitversions} and $version !~ /^$opt{limitversions}/;
 
     ## Old style:
     $data =~ s{.*?(<div class="SECT1")}{$1}s;
@@ -478,6 +482,7 @@ Zeugswetter Andres : Andreas Zeugswetter
 
 for my $short (sort keys %namesmatch) {
     next if $namesmatch{$short};
+    next if $opt{limitversions};
     print STDOUT "NO MATCH FOR SHORTNAME $short!\n";
     exit;
 }
