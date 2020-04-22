@@ -305,6 +305,9 @@ for my $row (@pagelist) {
     ## We are not using the existing CSS, so remove all classes
     $data =~ s{ class="\w+"}{}sg;
 
+    ## Remove the not helpful titles as well
+    $data =~ s{ title=".+?"}{}g;
+
     ## Spelling fixes
     $data =~ s{Jdbc}{JDBC}g;
 
