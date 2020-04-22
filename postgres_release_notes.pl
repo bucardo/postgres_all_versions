@@ -201,7 +201,7 @@ for my $row (@pagelist) {
     my ($startrow,$startcell) = (0,0);
 
     ## Store EOL flag for later
-    $version_is_eol{$version} = $major <= $EOL ? 1 : 0;
+    $version_is_eol{$version} = $major <= $EOL ? (exists $EOLDATE{$major} ? " as of $EOLDATE{$major}" : '') : 0;
 
     $startrow = 1 if ! defined $oldmajor;
 
@@ -498,7 +498,7 @@ Zeugswetter Andres : Andreas Zeugswetter
     if ($fullversion =~ /^\d+$/) {
         $fullversion = "$version.0";
     }
-    my $eol = $version_is_eol{$version} ? qq{ <span class="eol"><a href="$EOLURL">(end of life)</a></span>} : '';
+    my $eol = '0' ne $version_is_eol{$version} ? qq{ <span class="eol"><a href="$EOLURL">(end of life$version_is_eol{$version})</a></span>} : '';
     print "<h1>Postgres version $fullversion$eol</h1>\n";
     print $data;
 
