@@ -297,7 +297,7 @@ for my $row (@pagelist) {
     $data =~ s{<h2}{<h1}sg;    $data =~ s{</h2>}{</h1>}sg;
     $data =~ s{<h3}{<h2}sg;    $data =~ s{</h3>}{</h2>}sg;
     $data =~ s{<h4}{<h3}sg;    $data =~ s{</h4>}{</h3>}sg;
-    $data =~ s{<h[56]}{<h4}sg;    $data =~ s{</h[56]>}{</h4>}sg;
+    $data =~ s{<h[56]}{<h4}sg; $data =~ s{</h[56]>}{</h4>}sg;
 
     ## Remove all the not important "E-dot" stuff
     $data =~ s{>E\.[\d+\.]+\s*}{>}gsm;
@@ -346,12 +346,13 @@ for my $row (@pagelist) {
     ## <a href="release-9-3-5.html">Section E.4</a>
     $data =~ s{href=\s*"release-([\d\-]+)\.html">Section.*?</a>}{
         (my $ver = $1) =~ s/\-/./g;
+        $ver .= '.0' if $ver =~ /^\d\d$/;
         qq{href="#version_$ver">Version $ver</a>}
     }gmsex;
 
     ## Redirect simple links
     ## <a href="postgres-fdw.html"><span class=
-    $data =~ s{href=\s*"(.+?)"}{href="$baseurl/$1"}g;
+    $data =~ s{href=\s*"(h.+?)"}{href="$baseurl/$1"}g;
 
     ## LINK CVE notices
     my $mitre = 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=';
