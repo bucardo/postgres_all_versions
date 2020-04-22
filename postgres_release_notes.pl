@@ -8,13 +8,39 @@ use Data::Dumper;
 use Getopt::Long qw/ GetOptions /;
 use 5.8.0;
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '9.4';
 my $EOLPLUS = '9.5';  ## EOL February 11, 2021
+my $EOLDATES = q{
+12 November 14, 2024
+11 November 9, 2023
+10 November 10, 2022
+9.6 November 11, 2021
+9.5 February 11, 2021
+9.4 February 13, 2020
+9.3 November 8, 2018
+9.2 November 9, 2017
+9.1 October 27, 2016
+9.0 October 8, 2015
+8.4 July 24, 2014
+8.3 February 7, 2013
+8.2 December 5, 2011
+8.1 November 8, 2010
+8.0 October 1, 2010
+7.4 October 1, 2010
+7.3 November 27, 2007
+7.2 February 4, 2007
+7.1 April 13, 2006
+7.0 May 8, 2005
+6.5 June 9, 2004
+6.4 October 30, 2003
+6.3 March 1, 2003
+};
+my %EOLDATE = map { /([0-9.]+) (.+)/; $1, $2 } grep { /[0-9]/ } split /\n/ => $EOLDATES;
 
 my %opt;
 GetOptions(
@@ -213,11 +239,12 @@ for my $row (@pagelist) {
             $showver = '6.0<br>and earlier...';
             $span = 1;
         }
+        my $expdate = ($major <= $EOL and exists $EOLDATE{$major}) ? ": $EOLDATE{$major}" : '';
         printf "<td%s%s><b>Postgres %s%s</b>\n",
             $span > 1 ? " colspan=$span" : '',
                 $major <= $EOL ? ' class="eol"' : '',
                     $showver,
-                        $major <= $EOL ? ' <br><span>(end of life)</span>' : '';
+                        $major <= $EOL ? " <br><span>(end of life$expdate)</span>" : '';
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
