@@ -305,6 +305,37 @@ for my $row (@pagelist) {
     ## We are not using the existing CSS, so remove all classes
     $data =~ s{ class="\w+"}{}sg;
 
+    ## Spelling fixes
+    $data =~ s{Jdbc}{JDBC}g;
+
+    ## Special header handling for old versions
+    $data =~ s{(\w[\w ]+)\n\-\-\-\-+}{
+        "<h4>$1</h4>"
+    }seg;
+    $data =~ s{<pre>(<h4>(.+?)</h4>)}{$1\n<pre>}g;
+
+    ## Special list handling for older Changes lists in 7x
+    $data =~ s{<pre>\n?((?:Fix PL|Remove unused WAL|Fix for numeric|JDBC fixes|Fix many CLUSTER|Many multibyte|Prevent function calls|New CLI interface|Many array fixes|subselect\+|Add NT README|Fix text|Add pg_dump|Fix for a tiny|Configure detection|ecpg cleanup|Fix binary cursors|Allow TIME|Fix problems with pg_dump|fix for SET|packet length checking|ALTER TABLE bug).+?)</pre>}{
+        my $innerlist = $1;
+        $innerlist =~ s!^([\w/])!<li>$1!gsm;
+        "<ul>$innerlist</ul>\n"
+    }seg;
+
+    ## Special inner lists
+    $data =~ s{  +(\* Rules on relations.+?from view works)}{
+        my $innerlist = $1;
+        $innerlist =~ s/\*/<li>/g;
+        "<ul> $innerlist </ul>"
+    }se;
+
+    ## Special handling for really, really old Changes
+    $data =~ s{<pre>((?:Source code maintenance|Incompatib|Copyright change).+?)</pre>}{
+        my $innerlist = $1;
+        $innerlist =~ s!^([A-Z].+?) \*!<h4>$1</h4>\n\*!gsm;
+        $innerlist =~ s/\* /<li>/g;
+        $innerlist;
+    }se;
+
     ## Add a header for quick jumping
     print qq{<a id="version_$version"></a>\n};
 
