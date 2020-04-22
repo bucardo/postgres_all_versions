@@ -82,6 +82,7 @@ table.gsm { border-collapse: collapse; border-spacing: 15px }
 table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top; white-space: nowrap; }
 table.gsm td.eol { color: #111111; font-size: smaller; }
 table.gsm td.eol span { color: #dd0000 }
+code { font-weight: bolder; }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
 </head>
