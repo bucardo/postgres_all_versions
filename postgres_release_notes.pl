@@ -14,7 +14,7 @@ my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '9.4';
-my $EOLPLUS = '9.5';  ## EOL February 11, 2021
+my $EOLPLUS = '9.5';
 my $EOLDATES = q{
 12 November 14, 2024
 11 November 9, 2023
@@ -59,7 +59,7 @@ if ($opt{help}) {
 my $verbose = $opt{verbose} || 0;
 my $cachedir = '/tmp/cache';
 my $index = 'https://www.postgresql.org/docs/release/';
-my $baseurl = 'http://www.postgresql.org/docs/current/static';
+my $baseurl = 'https://www.postgresql.org/docs/current/static';
 
 my $pagecache = {};
 
@@ -347,13 +347,13 @@ for my $row (@pagelist) {
     ## <a href="release-9-3-5.html">Section E.4</a>
     $data =~ s{href=\s*"release-([\d\-]+)\.html">Section.*?</a>}{
         (my $ver = $1) =~ s/\-/./g;
-        $ver .= '.0' if $ver =~ /^\d\d$/;
+        $ver .= '.0' if $ver =~ /^\d\d$/ or $ver =~ /^\d\.\d$/;
         qq{href="#version_$ver">Version $ver</a>}
     }gmsex;
 
     ## Redirect simple links
-    ## <a href="postgres-fdw.html"><span class=
-    $data =~ s{href=\s*"(h.+?)"}{href="$baseurl/$1"}g;
+    ## <a href="queries-with.html">common table expressions</a>
+    $data =~ s{href=\s*"([^#].+?)"}{href="$baseurl/$1"}g;
 
     ## LINK CVE notices
     my $mitre = 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=';
