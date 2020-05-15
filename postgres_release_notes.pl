@@ -353,7 +353,7 @@ for my $row (@pagelist) {
 
     ## Redirect simple links
     ## <a href="queries-with.html">common table expressions</a>
-    $data =~ s{href=\s*"([^#].+?)"}{href="$baseurl/$1"}g;
+    $data =~ s{href=\s*"([^#].+?)"}{href="$baseurl/$1" target="_blank"}g;
 
     ## LINK CVE notices
     my $mitre = 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=';
