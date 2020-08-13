@@ -583,7 +583,7 @@ sub fetch_page {
     my $file = "$cachedir/$safename";
 
     my $skipcache = 0;
-    if ($opt{nocache} or ($page =~ /release\.html/ and $opt{noindexcache})) {
+    if ($opt{nocache} or ($page =~ /release\W*$/ and $opt{noindexcache})) {
         $skipcache = 1;
     }
 
