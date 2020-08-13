@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use LWP::UserAgent;
 use HTTP::Request;
-use Data::Dumper;
+use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 use Getopt::Long qw/ GetOptions /;
 use 5.8.0;
 
@@ -125,7 +125,8 @@ while ($content =~ m{a href="/docs/release/(\d[\d\.]+?)/"}gs) {
         $verbose and warn "Version $version never released\n";
         $founddate = 1;
     }
-    elsif ($pageinfo =~ m{Release [Dd]ate:\D+\d\d\d\d\-\?}) {
+    ## <p><strong>Release date:&nbsp;</strong>2020-XX-XX, CURRENT AS OF 2020-08-09</p>
+    elsif ($pageinfo =~ m{Release [Dd]ate:.+CURRENT AS OF}) {
         $versiondate{$version} = 'future';
         $founddate = 1;
         $total--;
@@ -534,7 +535,7 @@ Zeugswetter Andres : Andreas Zeugswetter
     if ($fullversion =~ /^\d+$/) {
         $fullversion = "$version.0";
     }
-    my $eol = '0' ne $version_is_eol{$version} ? qq{ <span class="eol"><a href="$EOLURL">(end of life$version_is_eol{$version})</a></span>} : '';
+    my $eol = '0' ne ($version_is_eol{$version} // 0) ? qq{ <span class="eol"><a href="$EOLURL">(end of life$version_is_eol{$version})</a></span>} : '';
     print "<h1>Postgres version $fullversion$eol</h1>\n";
     print $data;
 
