@@ -6,7 +6,7 @@ use LWP::UserAgent;
 use HTTP::Request;
 use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 use Getopt::Long qw/ GetOptions /;
-use 5.8.0;
+use 5.24.0;
 
 our $VERSION = '1.24';
 
