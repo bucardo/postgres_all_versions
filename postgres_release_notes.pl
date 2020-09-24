@@ -530,6 +530,14 @@ Zeugswetter Andres : Andreas Zeugswetter
         $totalfail++;
     }
 
+    ## Special credit for the original authors
+    if ('0.01' eq $version) {
+        my $authors = original_authors();
+        (my $namelist) = join "\n" => map { "<li>$_</li>" } $authors->@*;
+
+        $data .= "<h3>Berkeley students who (along with Larry Rowe) helped write the original version:</h3>\n$namelist\n";
+    }
+
     my $fullversion = $version;
 
     if ($fullversion =~ /^\d+$/) {
@@ -613,3 +621,59 @@ sub fetch_page {
     return $data;
 
 } ## end of fetch_page
+
+
+sub original_authors {
+
+    ## Returns a list of the original authors, per https://momjian.us/main/blogs/pgblog/2020.html#September_21_2020
+
+my $author_list = '
+Jeff Alton
+Paul Aoki
+James Bell
+Jennifer Caetta
+Philip Chang
+Jolly Chen
+Ron Choi
+Matt Dillon
+Zelaine Fong
+Adam Glass
+Jeffrey Goh
+Steven Grady
+Serge Granik
+Marti Hearst
+Joey Hellerstein
+Michael Hirohama
+Chin-Heng Hong
+Wei Hong
+Anant Jhingran
+Greg Kemnitz
+Marcel Kornacker
+Case Larsen
+Boris Livshitz
+Jeff Meredith
+Ginger Ogle
+Mike Olson
+Nels Olson
+Lay-Peng Ong
+Carol Paxson
+Avi Pfeffer
+Spyros Potamianos
+Sunita Surawagi
+David Muir Sharnoff
+Mark Sullivan
+Cimarron Taylor
+Marc Teitelbaum
+Yongdong Wang
+Kristen Wright
+Andrew Yu
+';
+
+my @list;
+push @list => $_ for (grep /\w/ => split /\n/ => $author_list);
+
+return \@list;
+
+} ## end of original_authors
+
+
