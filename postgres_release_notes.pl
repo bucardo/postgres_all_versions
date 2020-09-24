@@ -16,6 +16,7 @@ my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '9.4';
 my $EOLPLUS = '9.5';
 my $EOLDATES = q{
+13 November 13, 2025
 12 November 14, 2024
 11 November 9, 2023
 10 November 10, 2022
@@ -80,8 +81,10 @@ print {$fh} qq{<!DOCTYPE html>
 span.gsm_v { color: #990000; font-family: monospace;}
 table.gsm { border-collapse: collapse; border-spacing: 15px }
 table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top; white-space: nowrap; }
-table.gsm td.eol { color: #111111; font-size: smaller; }
+table.gsm td.eol { font-size: smaller; }
 table.gsm td.eol span { color: #dd0000 }
+table.gsm td.notdeadyet { font-size: smaller; }
+table.gsm td.notdeadyet span { color: #339900 }
 code { font-weight: bolder; }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
@@ -241,12 +244,13 @@ for my $row (@pagelist) {
             $showver = '6.0<br>and earlier...';
             $span = 1;
         }
-        my $expdate = ($major <= $EOL and exists $EOLDATE{$major}) ? ": $EOLDATE{$major}" : '';
+        my $expdate = (exists $EOLDATE{$major}) ? ": $EOLDATE{$major}" : '';
+        $expdate =~ s/([A-S]\w{2})\w+/$1/;
         printf "<td%s%s><b>Postgres %s%s</b>\n",
             $span > 1 ? " colspan=$span" : '',
-                $major <= $EOL ? ' class="eol"' : '',
+                $major <= $EOL ? ' class="eol"' : ' class="notdeadyet"',
                     $showver,
-                        $major <= $EOL ? " <br><span>(end of life$expdate)</span>" : '';
+                        " <br><span>(end of life$expdate)</span>";
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
