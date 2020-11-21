@@ -278,7 +278,8 @@ for my $row (@pagelist) {
 
     ## Much of this changes from version to version
 
-    $data =~ s{.*(<p><strong>Release date)}{$1}s;
+    $data =~ s{.*(<p>(<strong>|<b>)Release date)}{$1}s
+        or die "No release date found for $url\n";
 
     $data =~ s{<div[^>]+class="navfooter">.*}{}is;
 
@@ -313,7 +314,6 @@ for my $row (@pagelist) {
     $data =~ s{<span>([^<]+)</span>}{$1}sg;
     ## Run again because of nested class="quote" things
     $data =~ s{<span>([^<]+)</span>}{$1}sg;
-
 
     ## Remove the not helpful titles as well
     $data =~ s{ title=".+?"}{}g;
