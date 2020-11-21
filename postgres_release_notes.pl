@@ -276,13 +276,11 @@ for my $row (@pagelist) {
 
     next if $opt{limitversions} and $version !~ /^$opt{limitversions}/;
 
-    ## Old style:
-    $data =~ s{.*?(<div class="SECT1")}{$1}s;
-    $data =~ s{<div class="NAVFOOTER".+}{}s;
+    ## Much of this changes from version to version
 
-    ## New as of version 10:
     $data =~ s{.*(<p><strong>Release date)}{$1}s;
-    $data =~ s{<div class="navfooter".+}{}s;
+
+    $data =~ s{<div[^>]+class="navfooter">.*}{}is;
 
     ## Add pretty version information for each bullet
     $data =~ s{<li>\s*<p>(.+?)</li>}{
