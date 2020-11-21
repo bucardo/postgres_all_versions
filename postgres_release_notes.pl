@@ -309,6 +309,12 @@ for my $row (@pagelist) {
     ## We are not using the existing CSS, so remove all classes
     $data =~ s{ class="\w+"}{}sg;
 
+    ## Lots of empty spans, so remove those too
+    $data =~ s{<span>([^<]+)</span>}{$1}sg;
+    ## Run again because of nested class="quote" things
+    $data =~ s{<span>([^<]+)</span>}{$1}sg;
+
+
     ## Remove the not helpful titles as well
     $data =~ s{ title=".+?"}{}g;
 
