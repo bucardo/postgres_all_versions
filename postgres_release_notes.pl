@@ -181,7 +181,7 @@ for my $row (@pagelist) {
     ## 6.0.0 to 9.4.Z: X.Y.Z
     elsif ($version =~ /^(\d\.\d+)\.(\d+)$/) {
         $major = $1;
-        $revision = 2;
+        $revision = $2;
     }
     ## Ancient stuff: X.Y where X <= 1
     elsif ($version =~ /^([01]\.\d\d?)$/) {
