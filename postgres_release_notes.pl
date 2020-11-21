@@ -520,7 +520,8 @@ Zeugswetter Andres : Andreas Zeugswetter
     }
     ## Gregs:
     for my $string ('8601 format', 'use pager', 'conforming', 'nonstandard ports') {
-        $names += $data =~ s/\Q$string\E\s+\(Greg\)/$string (Greg Sabino Mullane)/;
+        my $search = $string =~ s/ /[ \n]/r;
+        $names += $data =~ s/$search \(Greg\)/$string (Greg Sabino Mullane)/;
     }
     for my $string ('for large values)', 'unnecessarily') {
         $names += $data =~ s/\Q$string\E\s+\(Greg([,\)])/$string (Greg Stark$1/;
@@ -529,8 +530,9 @@ Zeugswetter Andres : Andreas Zeugswetter
     while ($data =~ m{[\(,]([A-Z]\w+)[,\)]}g) {
         my $name = $1;
         next if $name =~ /^SQL|WARN|ERROR|MVCC|OID|NUL|ZONE|EPOCH|GEQO|WAL|WIN|Window|Alpha|Apple|BC|PITR|TIME|BUFFER|GBK|UHC/;
-        next if $name =~ /^TM|PL|SSL|XID|V0|ANALYZE|CTE|CV|LRU|MAX|ORM|SJIS|CN|CSV|Czech|JOHAB|ISM|Also|BLOB/;
-        next if $name =~ /^Taiwan|Mips|However|Japan|Ukrain|Venezuela|Altai|Kaliningrad/;
+        next if $name =~ /^TM|PL|SSL|XID|V0|ANALYZE|CTE|CV|LRU|MAX|ORM|SJIS|CN|CSV|Czech|JOHAB|ISM|Also|BLOB|SIGKILL|JIT|NOT/;
+        next if $name =~ /^Mojave/;
+        next if $name =~ /^Taiwan|Mips|However|Japan|Ukrain|Venezuela|Altai|Kaliningrad|Antarctica|Volgograd/;
         next if $name eq 'MauMau' or $name eq 'Fiji' or $name eq 'ViSolve';
         next if $name eq 'Rumko' or $name eq 'Higepon' or $name eq 'Darwin';
         next if $name eq 'Simplified' or $name eq 'RLS' or $name eq 'OS';
@@ -565,7 +567,7 @@ for my $short (sort keys %namesmatch) {
 }
 
 for (sort keys %fail) {
-    print STDOUT "$_: $fail{$_}\n";
+    print STDOUT "Failed to match $_: $fail{$_}\n";
 }
 warn "Total name misses: $totalfail\n";
 
