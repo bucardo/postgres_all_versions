@@ -8,7 +8,7 @@ use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 use Getopt::Long qw/ GetOptions /;
 use 5.24.0;
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -78,14 +78,15 @@ print {$fh} qq{<!DOCTYPE html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <style><!--
-span.gsm_v { color: #990000; font-family: monospace;}
+a.nw { white-space: nowrap }
+span.gsm_v { color: #990000; font-family: monospace }
 table.gsm { border-collapse: collapse; border-spacing: 15px }
-table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top; white-space: nowrap; }
-table.gsm td.eol { font-size: smaller; }
+table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top; white-space: nowrap }
+table.gsm td.eol { font-size: smaller }
 table.gsm td.eol span { color: #dd0000 }
-table.gsm td.notdeadyet { font-size: smaller; }
+table.gsm td.notdeadyet { font-size: smaller }
 table.gsm td.notdeadyet span { color: #339900 }
-code { font-weight: bolder; }
+code { font-weight: bolder }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
 </head>
@@ -368,7 +369,7 @@ for my $row (@pagelist) {
     my $mitre = 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=';
     my $redhat = 'https://access.redhat.com/security/cve';
 
-    $data =~ s{(CVE-[\d\-]+)}{<a href="$mitre$1">$1</a> or <a href="$redhat/$1">$1</a>}g;
+    $data =~ s{(CVE-[\d\-]+)}{<a href="$mitre$1">$1</a> or <a href="$redhat/$1" class="nw">$1</a>}g;
 
     ## Put spaces before some parens
     $data =~ s{(...\w)\(([A-Z]...)}{$1 ($2}g;
