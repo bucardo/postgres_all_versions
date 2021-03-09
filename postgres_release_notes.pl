@@ -8,7 +8,7 @@ use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 use Getopt::Long qw/ GetOptions /;
 use 5.24.0;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
