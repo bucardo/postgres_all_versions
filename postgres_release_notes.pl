@@ -13,8 +13,8 @@ our $VERSION = '1.26';
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
-my $EOL = '9.4';
-my $EOLPLUS = '9.5';
+my $EOL = '9.5';
+my $EOLPLUS = '9.6';
 my $EOLDATES = q{
 13 November 13, 2025
 12 November 14, 2024
