@@ -187,7 +187,7 @@ for my $row (@pagelist) {
         $revision = $2;
     }
     ## Ancient stuff: X.Y where X <= 1
-    elsif ($version =~ /^([01]\.\d\d?)$/) {
+    elsif ($version =~ /^([01])\.\d\d?$/) {
         $major = $1;
         $revision = 0;
     }
@@ -259,7 +259,7 @@ for my $row (@pagelist) {
     die "No version date found for $version!\n" if ! $versiondate{$version};
     printf qq{<br><a href="#version_%s">%s</a> (%s)\n},
         $version,
-            ($revision>=1 ? $version : qq{<b>$version</b>}),
+            ( ($revision>=1 or $major <= 6) ? $version : qq{<b>$version</b>}),
                 $versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
     $oldmajor = $major;
 }
