@@ -83,10 +83,11 @@ a.nw { white-space: nowrap }
 span.gsm_v { color: #990000; font-family: monospace }
 table.gsm { border-collapse: collapse; border-spacing: 15px }
 table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top; white-space: nowrap }
-table.gsm td.eol { font-size: smaller }
+table.gsm td.eol { font-size: x-small; font-family: monospace }
 table.gsm td.eol span { color: #dd0000 }
 table.gsm td.notdeadyet { font-size: smaller }
 table.gsm td.notdeadyet span { color: #339900 }
+span.gsmt { font-family: serif !important; color: black !important; font-weight: bolder !important }
 code { font-weight: bolder }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
@@ -237,9 +238,9 @@ for my $row (@pagelist) {
         }
         my $showver = $major;
         my $span = 1;
-        ## Last one before EOL
-        if ($major eq  $EOLPLUS) {
-            $span = 3;
+        ## EOL
+        if ($major eq $EOL) {
+            $span = 2;
             $current_column += 2;
         }
         if ($major eq '6.0') {
@@ -248,7 +249,7 @@ for my $row (@pagelist) {
         }
         my $expdate = (exists $EOLDATE{$major}) ? ": $EOLDATE{$major}" : '';
         $expdate =~ s/([A-S]\w{2})\w+/$1/;
-        printf "<td%s%s><b>Postgres %s%s</b>\n",
+        printf "<td%s%s><span class='gsmt'>Postgres %s%s</span>\n",
             $span > 1 ? " colspan=$span" : '',
                 $major <= $EOL ? ' class="eol"' : ' class="notdeadyet"',
                     $showver,
