@@ -8,7 +8,7 @@ use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 use Getopt::Long qw/ GetOptions /;
 use 5.24.0;
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -132,13 +132,14 @@ while ($content =~ m{a href="/docs/release/(\d[\d\.]+?)/"}gs) {
         $founddate = 1;
     }
     ## <p><strong>Release date:&nbsp;</strong>2020-XX-XX, CURRENT AS OF 2020-08-09</p>
-    elsif ($pageinfo =~ m{Release [Dd]ate:.+CURRENT AS OF}) {
+    ## <p><strong>Release date:&nbsp;</strong>2021-??-?? (AS OF 2021-06-20)</p>
+    elsif ($pageinfo =~ m{Release [Dd]ate:.+AS OF \d\d\d\d}) {
         $versiondate{$version} = 'future';
         $founddate = 1;
         $total--;
     }
     if (!$founddate) {
-        die "No date found for version $version at page $pageurl!\n";
+        die "No date found for version $version at page $pageurl: $pageinfo!\n";
     }
 }
 
