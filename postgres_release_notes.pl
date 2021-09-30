@@ -16,6 +16,7 @@ my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '9.5';
 my $EOLPLUS = '9.6';
 my $EOLDATES = q{
+14 November 12, 2026
 13 November 13, 2025
 12 November 14, 2024
 11 November 9, 2023
