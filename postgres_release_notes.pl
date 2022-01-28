@@ -8,13 +8,13 @@ use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 use Getopt::Long qw/ GetOptions /;
 use 5.24.0;
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
-my $EOL = '9.5';
-my $EOLPLUS = '9.6';
+my $EOL = '9.6';
+my $EOLSOON = '10';
 my $EOLDATES = q{
 14 November 12, 2026
 13 November 13, 2025
@@ -86,6 +86,8 @@ table.gsm { border-collapse: collapse; border-spacing: 15px }
 table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top; white-space: nowrap }
 table.gsm td.eol { font-size: x-small; font-family: monospace }
 table.gsm td.eol span { color: #dd0000 }
+table.gsm td.eolsoon { font-size: x-small; font-family: monospace }
+table.gsm td.eolsoon span { color: #ff9900 }
 table.gsm td.notdeadyet { font-size: smaller }
 table.gsm td.notdeadyet span { color: #339900 }
 span.gsmt { font-family: serif !important; color: black !important; font-weight: bolder !important }
@@ -246,13 +248,14 @@ for my $row (@pagelist) {
             $current_column += 2;
         }
         if ($major eq '6.0') {
-            $showver = '6.0<br>and earlier...';
-            $span = 1;
+            $showver = '6.0 and earlier...';
+            $span = 7;
         }
         my $expdate = (exists $EOLDATE{$major}) ? ": $EOLDATE{$major}" : '';
         $expdate =~ s/([A-S]\w{2})\w+/$1/;
         printf "<td%s%s><span class='gsmt'>Postgres %s%s</span>\n",
             $span > 1 ? " colspan=$span" : '',
+              $major == $EOLSOON ? ' class="eolsoon" ' :
                 $major <= $EOL ? ' class="eol"' : ' class="notdeadyet"',
                     $showver,
                         " <br><span>(end of life$expdate)</span>";
