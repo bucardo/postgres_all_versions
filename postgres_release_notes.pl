@@ -6,6 +6,7 @@ use LWP::UserAgent;
 use HTTP::Request;
 use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 use Getopt::Long qw/ GetOptions /;
+use utf8;
 use 5.24.0;
 
 our $VERSION = '1.30';
@@ -89,7 +90,7 @@ table.gsm td.eol { font-size: x-small; font-family: monospace }
 table.gsm td.eol span { color: #dd0000 }
 table.gsm td.eolsoon { font-size: small; font-family: monospace }
 table.gsm td.eolsoon span { color: #ff9900 }
-table.gsm td.notdeadyet { font-size: smaller }
+table.gsm td.notdeadyet { font-size: small; }
 table.gsm td.notdeadyet span { color: #339900 }
 span.gsmt { font-family: serif !important; color: black !important; font-weight: bolder !important }
 code { font-weight: bolder }
@@ -419,7 +420,7 @@ my $namelist = q{
 Adrian      : Adrian Hall
 Aldrin      : Aldrin Leal
 Alfred      : Alfred Perlstein
-Alvaro      : Alvaro Herrera
+Alvaro      : Álvaro Herrera
 Anand       : Anand Surelia
 Anders      : Anders Hammarquist
 Andreas     : Andreas Zeugswetter
@@ -514,7 +515,7 @@ Zeugswetter Andres : Andreas Zeugswetter
 
     for (split /\n/ => $namelist) {
         next if ! /\w/;
-        die "Invalid line: $_\n" if ! /^([A-Z][\w \?']+?)\s+:\s+([A-Z][\wé\.\-\' ]+?)(\s*:.+)?$/;
+        die "Invalid line: $_\n" if ! /^([A-Z][\w \?']+?)\s+:\s+([ÁA-Z][\wé\.\-\' ]+?)(\s*:.+)?$/;
         my ($short,$long,$extra) = ($1,$2,$3||'');
         my $count = 0;
         $extra =~ s/^\s*:\s*//;
@@ -539,6 +540,8 @@ Zeugswetter Andres : Andreas Zeugswetter
     for my $string ('for large values)', 'unnecessarily') {
         $names += $data =~ s/\Q$string\E\s+\(Greg([,\)])/$string (Greg Stark$1/;
     }
+    ## Álvaro:
+    $names += $data =~ s/Alvaro/Álvaro/g;
 
     while ($data =~ m{[\(,]([A-Z]\w+)[,\)]}g) {
         my $name = $1;
