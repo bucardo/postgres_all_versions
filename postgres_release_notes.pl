@@ -8,13 +8,14 @@ use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 use Getopt::Long qw/ GetOptions /;
 use 5.24.0;
 
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '9.6';
 my $EOLSOON = '10';
+my $CURRENT_VERSION = 14;
 my $EOLDATES = q{
 14 November 12, 2026
 13 November 13, 2025
@@ -107,9 +108,11 @@ my %versiondate;
 
 ## First run to gather version information
 
-while ($content =~ m{a href="/docs/release/(\d[\d\.]+?)/"}gs) {
-    my $version = $1;
+while ($content =~ m{a href="/docs/release/(\d+)([\d\.]+?)/"}gs) {
+    my ($v1,$v2) = ($1,$2);
+    my $version = "$v1$v2";
     $verbose and warn "Found version $version\n";
+    next if $v1 > $CURRENT_VERSION;
     my $pageurl = "$index$version/";
 	my $pageinfo = fetch_page($pageurl);
 	$total++;
