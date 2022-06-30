@@ -87,7 +87,7 @@ table.gsm { border-collapse: collapse; border-spacing: 15px }
 table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top; white-space: nowrap }
 table.gsm td.eol { font-size: x-small; font-family: monospace }
 table.gsm td.eol span { color: #dd0000 }
-table.gsm td.eolsoon { font-size: x-small; font-family: monospace }
+table.gsm td.eolsoon { font-size: small; font-family: monospace }
 table.gsm td.eolsoon span { color: #ff9900 }
 table.gsm td.notdeadyet { font-size: smaller }
 table.gsm td.notdeadyet span { color: #339900 }
