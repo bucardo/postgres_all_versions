@@ -166,7 +166,7 @@ print qq{
 
 ## Table of Contents
 print "<table class='gsm'>\n";
-my $COLS = 7;
+my $COLS = 6;
 my $startrow=1;
 my $startcell=1;
 my $oldmajor;
@@ -232,38 +232,45 @@ for my $row (@pagelist) {
         $verbose > 2 and warn "Switched to version $version, startrow is $startrow, current cols is $current_column\n";
     }
 
-    if ($startrow) {
+    if ($startrow and $major > 6.4) {
         ## Close old row if needed
         if ($major != $highversion) {
-            print "</tr>\n";
+            print "</tr> <!-- $major -->\n";
         }
         print "<tr>\n";
     }
 
     if ($startcell) {
         ## Close old cell if needed
-        if ($major != $highversion and ! $startrow) {
+        if ($major != $highversion and ! $startrow and $major !~ /^6\.[01234]/) {
             print "</td>\n";
         }
         my $showver = $major;
         my $span = 1;
         ## EOL
         if ($major eq $EOL) {
-            $span = 2;
-            $current_column += 2;
+            $span = 1;
+            $current_column += 0;
         }
         if ($major eq '6.0') {
             $showver = '6.0 and earlier...';
-            $span = 7;
+            #$span = 7;
         }
         my $expdate = (exists $EOLDATE{$major}) ? ": $EOLDATE{$major}" : '';
         $expdate =~ s/([A-S]\w{2})\w+/$1/;
-        printf "<td%s%s><span class='gsmt'>Postgres %s%s</span>\n",
+        if ($major =~ /^6\.[01234]/) {
+            print '<br><br>';
+            $current_column=0;
+        }
+        else {
+            printf "<td%s%s>",
             $span > 1 ? " colspan=$span" : '',
               $major == $EOLSOON ? ' class="eolsoon" ' :
-                $major <= $EOL ? ' class="eol"' : ' class="notdeadyet"',
-                    $showver,
-                        " <br><span>(end of life$expdate)</span>";
+                $major <= $EOL ? ' class="eol"' : ' class="notdeadyet"';
+        }
+        printf "<span class='gsmt'>Postgres %s%s</span>\n",
+          $showver,
+          " <br><span>(end of life$expdate)</span>";
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
