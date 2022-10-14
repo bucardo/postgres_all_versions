@@ -543,6 +543,10 @@ Zeugswetter Andres : Andreas Zeugswetter
     ## Álvaro:
     $names += $data =~ s/Alvaro/Álvaro/g;
 
+    ## Hans:
+    $names += $data =~ s/Hans-Jurgen Schonig/Hans-Jürgen Schonig/g;
+    $names += $data =~ s/Hans-Juergen/Hans-Jürgen/g;
+
     while ($data =~ m{[\(,]([A-Z]\w+)[,\)]}g) {
         my $name = $1;
         next if $name =~ /^SQL|WARN|ERROR|MVCC|OID|NUL|ZONE|EPOCH|GEQO|WAL|WIN|Window|Alpha|Apple|BC|PITR|TIME|BUFFER|GBK|UHC/;
@@ -702,5 +706,3 @@ push @list => $_ for (grep /\w/ => split /\n/ => $author_list);
 return \@list;
 
 } ## end of original_authors
-
-
