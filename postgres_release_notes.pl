@@ -9,15 +9,16 @@ use Getopt::Long qw/ GetOptions /;
 use utf8;
 use 5.24.0;
 
-our $VERSION = '1.30';
+our $VERSION = '1.31';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '9.6';
 my $EOLSOON = '10';
-my $CURRENT_VERSION = 14;
+my $CURRENT_VERSION = 15;
 my $EOLDATES = q{
+15 November 11, 2027
 14 November 12, 2026
 13 November 13, 2025
 12 November 14, 2024
