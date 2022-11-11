@@ -9,7 +9,7 @@ use Getopt::Long qw/ GetOptions /;
 use utf8;
 use 5.24.0;
 
-our $VERSION = '1.31';
+our $VERSION = '1.32';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -177,6 +177,10 @@ my $seeneol = 0;
 my %version_is_eol;
 my $current_column = 0;
 
+my $major_nowraps = '6.0 6.1 6.2 6.3 6.4 7.0';
+
+my %major_nowrap = map { $_ => 1 } split /\s+/ => $major_nowraps;
+
 for my $row (@pagelist) {
     my ($url,$version,$data) = @$row;
     my $major = 0;
@@ -242,7 +246,7 @@ for my $row (@pagelist) {
 
     if ($startcell) {
         ## Close old cell if needed
-        if ($major != $highversion and ! $startrow and $major !~ /^6\.[01234]/) {
+        if ($major != $highversion and ! $startrow and not exists $major_nowrap{$major}) {
             print "</td>\n";
         }
         my $showver = $major;
@@ -254,11 +258,14 @@ for my $row (@pagelist) {
         }
         if ($major eq '6.0') {
             $showver = '6.0 and earlier...';
-            #$span = 7;
+        }
+        if ($major eq $CURRENT_VERSION) {
+            $span = 2;
+            $current_column++;
         }
         my $expdate = (exists $EOLDATE{$major}) ? ": $EOLDATE{$major}" : '';
         $expdate =~ s/([A-S]\w{2})\w+/$1/;
-        if ($major =~ /^6\.[01234]/) {
+        if (exists $major_nowrap{$major}) {
             print '<br><br>';
             $current_column=0;
         }
