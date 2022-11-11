@@ -284,7 +284,7 @@ for my $row (@pagelist) {
 print "</table>\n";
 print STDOUT "Highest version: $highversion (revision $highrevision)\n";
 
-exit if $opt{'debug-tableonly'};
+die "Rewrote $bigpage\n" if $opt{'debug-tableonly'};
 
 my $names = 0;
 my %namesmatch;
