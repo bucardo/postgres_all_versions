@@ -77,7 +77,7 @@ my $content = fetch_page($index);
 my $total = 0;
 my $bigpage = "$cachedir/postgres_all_versions.html";
 open my $fh, '>', $bigpage or die qq{Could not open "$bigpage": $!\n}; ## no critic (InputOutput::RequireBriefOpen)
-print {$fh} qq{<!DOCTYPE html>
+print {$fh} q{<!DOCTYPE html>
 <html lang='en'>
 
 <head>
@@ -167,13 +167,10 @@ print qq{
 ## Table of Contents
 print "<table class='gsm'>\n";
 my $COLS = 6;
-my $startrow=1;
-my $startcell=1;
 my $oldmajor;
 my $highversion = 1.0;
 my $highrevision = 0;
 my $revision = 0;
-my $seeneol = 0;
 my %version_is_eol;
 my $current_column = 0;
 
@@ -182,7 +179,9 @@ my $major_nowraps = '6.0 6.1 6.2 6.3 6.4 7.0';
 my %major_nowrap = map { $_ => 1 } split /\s+/ => $major_nowraps;
 
 for my $row (@pagelist) {
-    my ($url,$version,$data) = @$row;
+
+    my $version = $row->[1];
+
     my $major = 0;
 
     $verbose > 2 and warn "Scanning version: $version\n";
@@ -270,7 +269,7 @@ for my $row (@pagelist) {
             $current_column=0;
         }
         else {
-            printf "<td%s%s>",
+            printf '<td%s%s>',
             $span > 1 ? " colspan=$span" : '',
               $major == $EOLSOON ? ' class="eolsoon" ' :
                 $major <= $EOL ? ' class="eol"' : ' class="notdeadyet"';
@@ -284,7 +283,7 @@ for my $row (@pagelist) {
     printf qq{<br><a href="#version_%s">%s</a> (%s)\n},
         $version,
             ( ($revision>=1 or $major <= 6) ? $version : qq{<b>$version</b>}),
-                $versiondate{$version} =~ /never/ ? "<em>never released!</em>" : "$versiondate{$version}";
+                $versiondate{$version} =~ /never/ ? '<em>never released!</em>' : "$versiondate{$version}";
     $oldmajor = $major;
 }
 
@@ -579,9 +578,9 @@ Zeugswetter Andres : Andreas Zeugswetter
     ## Special credit for the original authors
     if ('0.01' eq $version) {
         my $authors = original_authors();
-        (my $namelist) = join "\n" => map { "<li>$_</li>" } $authors->@*;
+        (my $namelist2) = join "\n" => map { "<li>$_</li>" } $authors->@*;
 
-        $data .= "<h3>Berkeley students who (along with Larry Rowe) helped write the original version:</h3>\n$namelist\n";
+        $data .= "<h3>Berkeley students who (along with Larry Rowe) helped write the original version:</h3>\n$namelist2\n";
     }
 
     my $fullversion = $version;
