@@ -9,7 +9,7 @@ use Getopt::Long qw/ GetOptions /;
 use utf8;
 use 5.24.0;
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -591,6 +591,10 @@ Zeugswetter Andres : Andreas Zeugswetter
     }
     my $eol = '0' ne ($version_is_eol{$version} // 0) ? qq{ <span class="eol"><a href="$EOLURL">(end of life$version_is_eol{$version})</a></span>} : '';
     print "<h1>Postgres version $fullversion$eol</h1>\n";
+
+    ## Contextual hints
+    $data =~ s{</h([3456])>}{ (PG $version)</h$1>}sg;
+
     print $data;
 
 }
