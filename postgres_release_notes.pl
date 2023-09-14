@@ -9,15 +9,16 @@ use Getopt::Long qw/ GetOptions /;
 use utf8;
 use 5.24.0;
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '10';
-my $EOLSOON = '0';
-my $CURRENT_VERSION = 15;
+my $EOLSOON = '11';
+my $CURRENT_VERSION = 16;
 my $EOLDATES = q{
+16 November 9, 2028
 15 November 11, 2027
 14 November 12, 2026
 13 November 13, 2025
@@ -259,8 +260,8 @@ for my $row (@pagelist) {
             $showver = '6.0 and earlier...';
         }
         if ($major eq $CURRENT_VERSION) {
-            $span = 2;
-            $current_column++;
+            $span = 1;
+            $current_column += 0;
         }
         my $expdate = (exists $EOLDATE{$major}) ? ": $EOLDATE{$major}" : '';
         $expdate =~ s/([A-S]\w{2})\w+/$1/;
@@ -305,6 +306,9 @@ for my $row (@pagelist) {
     next if $opt{limitversions} and $version !~ /^$opt{limitversions}/;
 
     ## Much of this changes from version to version
+
+    ## Remove the new helper tags
+    $data =~ s{ <a href="#(.+?)">#</a>}{}gsm;
 
     $data =~ s{.*(<p>(<strong>|<b>)Release date)}{$1}s
         or die "No release date found for $url\n";
