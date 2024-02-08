@@ -13,6 +13,8 @@ our $VERSION = '1.34';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
+my $PG_DUMP_URL = 'https://www.postgresql.org/docs/current/app-pgdump.html';
+
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '10';
 my $EOLSOON = '11';
@@ -432,6 +434,9 @@ for my $row (@pagelist) {
     ## Replace tt with kbd
     $data =~ s{<tt.*?>}{<kbd>}gsm;
     $data =~ s{</tt>}{</kbd>}g;
+
+    ## Expand a few things
+    $data =~ s{A dump/restore}{A <a href="$PG_DUMP_URL">dump/restore</a>}gsm;
 
     ## Expand some names
 my $namelist = q{
