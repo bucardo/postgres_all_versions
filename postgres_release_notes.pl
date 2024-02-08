@@ -17,6 +17,8 @@ my $PG_DUMP_URL = 'https://www.postgresql.org/docs/current/app-pgdump.html';
 
 my $GREG_URL = 'https://www.linkedin.com/in/abcde/';
 
+my $BEST_VERSION_COLOR = '#000800';
+
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '10';
 my $EOLSOON = '11';
@@ -82,7 +84,7 @@ my $content = fetch_page($index);
 my $total = 0;
 my $bigpage = "$cachedir/postgres_all_versions.html";
 open my $fh, '>', $bigpage or die qq{Could not open "$bigpage": $!\n}; ## no critic (InputOutput::RequireBriefOpen)
-print {$fh} q{<!DOCTYPE html>
+print {$fh} qq{<!DOCTYPE html>
 <html lang='en'>
 
 <head>
@@ -100,6 +102,7 @@ table.gsm td.notdeadyet { font-size: small; }
 table.gsm td.notdeadyet span { color: #339900 }
 span.gsmt { font-family: serif !important; color: black !important; font-weight: bolder !important }
 code { font-weight: bolder }
+a.bv { color: $BEST_VERSION_COLOR; font-weight: bolder }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
 </head>
@@ -285,7 +288,8 @@ for my $row (@pagelist) {
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
-    printf qq{<br><a href="#version_%s">%s</a> (%s)\n},
+    printf qq{<br><a %shref="#version_%s">%s</a> (%s)\n},
+      ($major > $EOL and $startcell) ? 'class="bv" ' : '',
         $version,
             ( ($revision>=1 or $major <= 6) ? $version : qq{<b>$version</b>}),
                 $versiondate{$version} =~ /never/ ? '<em>never released!</em>' : "$versiondate{$version}";
