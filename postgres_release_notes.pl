@@ -9,7 +9,7 @@ use Getopt::Long qw/ GetOptions /;
 use utf8;
 use 5.24.0;
 
-our $VERSION = '1.34';
+our $VERSION = '1.35';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -167,7 +167,7 @@ my $oldselect = select $fh;
 print qq{
 <h1>Postgres Changelog - All Versions</h1>
 
-<p>This is a complete, one-page listing of changes across all Postgres versions. All versions $EOL and older are EOL (<a href="$EOLURL">end of life</a>) and unsupported.<br> This page was generated on $date by a script (version $VERSION) by <a href="$GREG_URL">Greg Sabino Mullane</a>, and contains information for $total versions of Postgres.</p>
+<p>Below is a complete, one-page listing of changes across all Postgres versions. All versions of PostgreSQL $EOL and older are EOL (<a href="$EOLURL">end of life</a>) and unsupported.<br> This page was generated on $date by a script (version $VERSION) by <a href="$GREG_URL">Greg Sabino Mullane</a>, and contains information for $total versions of Postgres.</p>
 
 };
 
