@@ -15,6 +15,8 @@ my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
 my $PG_DUMP_URL = 'https://www.postgresql.org/docs/current/app-pgdump.html';
 
+my $GREG_URL = 'https://www.linkedin.com/in/abcde/';
+
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '10';
 my $EOLSOON = '11';
@@ -162,7 +164,7 @@ my $oldselect = select $fh;
 print qq{
 <h1>Postgres Changelog - All Versions</h1>
 
-<p>This is a complete, one-page listing of changes across all Postgres versions. All versions $EOL and older are EOL (<a href="$EOLURL">end of life</a>) and unsupported. This page was generated on $date by a script (version $VERSION) by Greg Sabino Mullane, and contains information for $total versions of Postgres.</p>
+<p>This is a complete, one-page listing of changes across all Postgres versions. All versions $EOL and older are EOL (<a href="$EOLURL">end of life</a>) and unsupported.<br> This page was generated on $date by a script (version $VERSION) by <a href="$GREG_URL">Greg Sabino Mullane</a>, and contains information for $total versions of Postgres.</p>
 
 };
 
