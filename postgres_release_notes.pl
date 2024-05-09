@@ -9,7 +9,7 @@ use Getopt::Long qw/ GetOptions /;
 use utf8;
 use 5.24.0;
 
-our $VERSION = '1.35';
+our $VERSION = '1.36';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -20,8 +20,8 @@ my $GREG_URL = 'https://www.linkedin.com/in/abcde/';
 my $BEST_VERSION_COLOR = '#000800';
 
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
-my $EOL = '10';
-my $EOLSOON = '11';
+my $EOL = '11';
+my $EOLSOON = '12';
 my $CURRENT_VERSION = 16;
 my $EOLDATES = q{
 16 November 9, 2028
