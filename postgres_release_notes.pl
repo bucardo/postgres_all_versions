@@ -409,7 +409,7 @@ for my $row (@pagelist) {
     my $mitre = 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=';
     my $redhat = 'https://access.redhat.com/security/cve';
 
-    $data =~ s{(CVE-[\d\-]+)}{<a href="$mitre$1">$1</a> or <a href="$redhat/$1" class="nw">$1</a>}g;
+    $data =~ s{[^-](CVE-[\d\-]+)}{<a href="$mitre$1">$1</a> or <a href="$redhat/$1" class="nw">$1</a>}g;
 
     ## Put spaces before some parens
     $data =~ s{(...\w)\(([A-Z]...)}{$1 ($2}g;
