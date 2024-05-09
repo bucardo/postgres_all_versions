@@ -586,7 +586,7 @@ Zeugswetter Andres : Andreas Zeugswetter
         next if $name eq 'MauMau' or $name eq 'Fiji' or $name eq 'ViSolve';
         next if $name eq 'Rumko' or $name eq 'Higepon' or $name eq 'Darwin';
         next if $name eq 'Simplified' or $name eq 'RLS' or $name eq 'OS';
-        next if $name eq 'Alternatively';
+        next if $name eq 'Alternatively' or $name eq 'Kerberos';
         $fail{$name}++;
         $totalfail++;
     }
