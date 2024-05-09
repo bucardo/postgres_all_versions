@@ -617,7 +617,7 @@ Zeugswetter Andres : Andreas Zeugswetter
 
     $versions_done++;
 
-    last if $versions_done >= $maxversions;
+    last if $maxversions and $versions_done >= $maxversions;
 
 }
 
