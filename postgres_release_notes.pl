@@ -63,13 +63,14 @@ GetOptions(
     'help',
     'limitversions=s',
     'debug-tableonly',
-    'debug-single-version',
+    'max-versions=i',
 );
 if ($opt{help}) {
     print "$USAGE\n";
     exit 0;
 }
 
+my $maxversions = $opt{'max-versions'} || 0;
 my $verbose = $opt{verbose} || 0;
 my $cachedir = '/tmp/cache';
 my $index = 'https://www.postgresql.org/docs/release/';
@@ -307,6 +308,8 @@ my %namesmatch;
 my %fail;
 
 my $totalfail=0;
+
+my $versions_done = 0;
 
 for my $row (@pagelist) {
 
@@ -612,13 +615,15 @@ Zeugswetter Andres : Andreas Zeugswetter
 
     print $data;
 
-    last if $opt{'debug-single-version'};
+    $versions_done++;
+
+    last if $versions_done >= $maxversions;
 
 }
 
 for my $short (sort keys %namesmatch) {
     next if $namesmatch{$short};
-    next if $opt{limitversions} or $opt{'debug-single-version'};
+    next if $opt{limitversions} or $maxversions;
     print STDOUT "NO MATCH FOR SHORTNAME $short!\n";
     exit;
 }
@@ -634,6 +639,7 @@ print "</body></html>\n";
 select $oldselect;
 close $fh;
 print "Total pages loaded: $total\n";
+print "Total versions written: $versions_done\n";
 print "Rewrote $bigpage\n";
 
 sub fetch_page {
