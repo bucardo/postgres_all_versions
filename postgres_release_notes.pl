@@ -63,6 +63,7 @@ GetOptions(
     'help',
     'limitversions=s',
     'debug-tableonly',
+    'debug-single-version',
 );
 if ($opt{help}) {
     print "$USAGE\n";
@@ -611,11 +612,13 @@ Zeugswetter Andres : Andreas Zeugswetter
 
     print $data;
 
+    last if $opt{'debug-single-version'};
+
 }
 
 for my $short (sort keys %namesmatch) {
     next if $namesmatch{$short};
-    next if $opt{limitversions};
+    next if $opt{limitversions} or $opt{'debug-single-version'};
     print STDOUT "NO MATCH FOR SHORTNAME $short!\n";
     exit;
 }
