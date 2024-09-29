@@ -9,7 +9,7 @@ use Getopt::Long qw/ GetOptions /;
 use utf8;
 use 5.24.0;
 
-our $VERSION = '1.36';
+our $VERSION = '1.37';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -22,8 +22,9 @@ my $BEST_VERSION_COLOR = '#000800';
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '11';
 my $EOLSOON = '12';
-my $CURRENT_VERSION = 16;
+my $CURRENT_VERSION = 17;
 my $EOLDATES = q{
+17 November 8, 2029
 16 November 9, 2028
 15 November 11, 2027
 14 November 12, 2026
@@ -184,7 +185,7 @@ my $revision = 0;
 my %version_is_eol;
 my $current_column = 0;
 
-my $major_nowraps = '6.0 6.1 6.2 6.3 6.4 7.0';
+my $major_nowraps = '6.0 6.1 6.2 6.3 6.4 7.0 7.1';
 
 my %major_nowrap = map { $_ => 1 } split /\s+/ => $major_nowraps;
 
