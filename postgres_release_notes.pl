@@ -9,7 +9,7 @@ use Getopt::Long qw/ GetOptions /;
 use utf8;
 use 5.24.0;
 
-our $VERSION = '1.37';
+our $VERSION = '1.38';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -92,8 +92,9 @@ print {$fh} qq{<!DOCTYPE html>
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style><!--
-a.nw { white-space: nowrap }
+a { white-space: nowrap }
 span.gsm_v { color: #990000; font-family: monospace }
 table.gsm { border-collapse: collapse; border-spacing: 15px }
 table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top; white-space: nowrap }
@@ -106,6 +107,13 @@ table.gsm td.notdeadyet span { color: #339900 }
 span.gsmt { font-family: serif !important; color: black !important; font-weight: bolder !important }
 code { font-weight: bolder }
 a.bv { color: $BEST_VERSION_COLOR; font-weight: bolder }
+a.a { position: relative; }
+a.a::after { visibility: hidden; position: absolute; opacity: 0; z-index: 5432;
+font-family: monospace; background-color: #336791; color: #FFF9C4; content: attr(data-tooltip);
+padding: 12px; border-radius: 14px; transition: opacity .3s; pointer-events: none; }
+a.a:hover::after { opacity: 1; visibility: visible; }
+a.c::after { top: 120%; transform: translateX(-42%) }
+a.l::after { left: 130% } a.g { text-decoration: none }
 --></style>
 <title>Postgres Release Notes - All Versions</title>
 </head>
@@ -189,6 +197,8 @@ my $major_nowraps = '6.0 6.1 6.2 6.3 6.4 7.0 7.1';
 
 my %major_nowrap = map { $_ => 1 } split /\s+/ => $major_nowraps;
 
+my %in_left_column;
+
 for my $row (@pagelist) {
 
     my $version = $row->[1];
@@ -252,6 +262,7 @@ for my $row (@pagelist) {
             print "</tr> <!-- $major -->\n";
         }
         print "<tr>\n";
+        $in_left_column{$major} = 1;
     }
 
     if ($startcell) {
@@ -291,8 +302,14 @@ for my $row (@pagelist) {
     }
 
     die "No version date found for $version!\n" if ! $versiondate{$version};
-    printf qq{<br><a %shref="#version_%s">%s</a> (%s)\n},
-      ($major > $EOL and $startcell) ? 'class="bv" ' : '',
+    my $tooltip = "Release notes for version $version";
+    my $tooltip_class = exists $in_left_column{$major} ? 'a l' : 'a c';
+    if ($revision < 1 and $major > 7) {
+        $tooltip = "Release notes for major version $major";
+    }
+
+    printf qq{<br><a class='%s' data-tooltip='%s' %shref="#version_%s">%s</a> (%s)\n},
+      $tooltip_class, $tooltip, ($major > $EOL and $startcell) ? 'class="bv" ' : '',
         $version,
             ( ($revision>=1 or $major <= 6) ? $version : qq{<b>$version</b>}),
                 $versiondate{$version} =~ /never/ ? '<em>never released!</em>' : "$versiondate{$version}";
@@ -327,6 +344,10 @@ for my $row (@pagelist) {
         or die "No release date found for $url\n";
 
     $data =~ s{<div[^>]+class="navfooter">.*}{}is;
+
+    ## Allow and reformat the new v17+ code tags
+    ## <a class="ulink" href="https://postgr.es/c/f347ec76e" target="_top">§</a>
+    $data =~ s{<a class="ulink".*?href="(.+?)/([a-f0-9]+)".*?>.+?</a>}{<a class='a c g' href='$1/$2' target='_blank' data-tooltip='View git commit $2'>&#x1F4DC</a>}gsm;
 
     ## Add pretty version information for each bullet
     $data =~ s{<li>\s*<p>(.+?)</li>}{
@@ -413,7 +434,7 @@ for my $row (@pagelist) {
     my $mitre = 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=';
     my $redhat = 'https://access.redhat.com/security/cve';
 
-    $data =~ s{[^-](CVE-[\d\-]+)}{<a href="$mitre$1">$1</a> or <a href="$redhat/$1" class="nw">$1</a>}g;
+    $data =~ s{[^-](CVE-[\d\-]+)}{<a href="$mitre$1">$1</a> or <a href="$redhat/$1">$1</a>}g;
 
     ## Put spaces before some parens
     $data =~ s{(...\w)\(([A-Z]...)}{$1 ($2}g;
