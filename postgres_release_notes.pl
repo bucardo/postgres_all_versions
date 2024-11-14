@@ -9,7 +9,7 @@ use Getopt::Long qw/ GetOptions /;
 use utf8;
 use 5.24.0;
 
-our $VERSION = '1.38';
+our $VERSION = '1.39';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
