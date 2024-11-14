@@ -65,7 +65,8 @@ GetOptions(
     'limitversions=s',
     'debug-tableonly',
     'max-versions=i',
-);
+) or die "$USAGE\n";
+
 if ($opt{help}) {
     print "$USAGE\n";
     exit 0;
