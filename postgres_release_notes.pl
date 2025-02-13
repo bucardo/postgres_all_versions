@@ -19,9 +19,10 @@ my $GREG_URL = 'https://www.linkedin.com/in/abcde/';
 
 my $BEST_VERSION_COLOR = '#000800';
 
+my $COLS = 6;
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
-my $EOL = '11';
-my $EOLSOON = '12';
+my $EOL = '12';
+my $EOLSOON = '13';
 my $CURRENT_VERSION = 17;
 my $EOLDATES = q{
 17 November 8, 2029
@@ -186,7 +187,6 @@ print qq{
 
 ## Table of Contents
 print "<table class='gsm'>\n";
-my $COLS = 6;
 my $oldmajor;
 my $highversion = 1.0;
 my $highrevision = 0;
