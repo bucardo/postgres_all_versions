@@ -66,6 +66,7 @@ GetOptions(
     'limitversions=s',
     'debug-tableonly',
     'max-versions=i',
+    'debug-name-diffs',
 ) or die "$USAGE\n";
 
 if ($opt{help}) {
@@ -89,6 +90,15 @@ my $content = fetch_page($index);
 my $total = 0;
 my $bigpage = "$cachedir/postgres_all_versions.html";
 open my $fh, '>', $bigpage or die qq{Could not open "$bigpage": $!\n}; ## no critic (InputOutput::RequireBriefOpen)
+
+my ($dfh1, $dfh2);
+if ($opt{'debug-name-diffs'}) {
+    my $diff1page = "$bigpage.original";
+    open $dfh1, '>', $diff1page;
+    my $diff2page = "$bigpage.new";
+    open $dfh2, '>', $diff2page;
+}
+
 print {$fh} qq{<!DOCTYPE html>
 <html lang='en'>
 
@@ -569,6 +579,11 @@ Zeugswetter Andres : Andreas Zeugswetter
 
 };
 
+    ## Contextual hints
+    $data =~ s{</h([3456])>}{ (PG $version)</h$1>}sg;
+
+    my $original_data = $data;
+
     for (split /\n/ => $namelist) {
         next if ! /\w/;
         die "Invalid line: $_\n" if ! /^([A-Z][\w \?']+?)\s+:\s+([ÁA-Z][\wé\.\-\' ]+?)(\s*:.+)?$/;
@@ -613,6 +628,7 @@ Zeugswetter Andres : Andreas Zeugswetter
         next if $name eq 'Rumko' or $name eq 'Higepon' or $name eq 'Darwin';
         next if $name eq 'Simplified' or $name eq 'RLS' or $name eq 'OS';
         next if $name eq 'Alternatively' or $name eq 'Kerberos';
+        next if $name eq 'VaibhaveS';
         $fail{$name}++;
         $totalfail++;
     }
@@ -633,10 +649,12 @@ Zeugswetter Andres : Andreas Zeugswetter
     my $eol = '0' ne ($version_is_eol{$version} // 0) ? qq{ <span class="eol"><a href="$EOLURL">(end of life$version_is_eol{$version})</a></span>} : '';
     print "<h1>Postgres version $fullversion$eol</h1>\n";
 
-    ## Contextual hints
-    $data =~ s{</h([3456])>}{ (PG $version)</h$1>}sg;
-
     print $data;
+
+    if ($opt{'debug-name-diffs'}) {
+        print {$dfh1} $original_data;
+        print {$dfh2} $data;
+    }
 
     $versions_done++;
 
@@ -664,6 +682,16 @@ close $fh;
 print "Total pages loaded: $total\n";
 print "Total versions written: $versions_done\n";
 print "Rewrote $bigpage\n";
+
+if ($opt{'debug-name-diffs'}) {
+    close $dfh1;
+    my $diff1page = "$bigpage.original";
+    warn "Write $diff1page\n";
+    close $dfh2;
+    my $diff2page = "$bigpage.new";
+    warn "Write $diff2page\n";
+}
+
 
 sub fetch_page {
 
