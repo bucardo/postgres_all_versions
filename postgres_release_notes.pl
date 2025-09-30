@@ -6,12 +6,18 @@ use LWP::UserAgent;
 use HTTP::Request;
 use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 use Getopt::Long qw/ GetOptions /;
-use utf8;
+use Encode 'decode';
+use utf8; binmode(STDOUT, ":encoding(UTF-8)");
+use open ':std', ':encoding(UTF-8)';
 use 5.24.0;
 
-our $VERSION = '1.39';
+our $VERSION = '1.40';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
+
+## --limitversions X = Only do one or more versions
+## --verbosenames = Show which names got changed
+## --debug-tableonly = Just the top HTML TOC
 
 my $PG_DUMP_URL = 'https://www.postgresql.org/docs/current/app-pgdump.html';
 
@@ -23,8 +29,9 @@ my $COLS = 6;
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '12';
 my $EOLSOON = '13';
-my $CURRENT_VERSION = 17;
+my $CURRENT_VERSION = 18;
 my $EOLDATES = q{
+18 November 14, 2030
 17 November 8, 2029
 16 November 9, 2028
 15 November 11, 2027
@@ -63,7 +70,8 @@ GetOptions(
     'nocache',
     'verbose',
     'help',
-    'limitversions=s',
+    'limitversions|limitversion=s',
+    'nameschanged',
     'debug-tableonly',
     'max-versions=i',
     'debug-name-diffs',
@@ -79,6 +87,9 @@ my $verbose = $opt{verbose} || 0;
 my $cachedir = '/tmp/cache';
 my $index = 'https://www.postgresql.org/docs/release/';
 my $baseurl = 'https://www.postgresql.org/docs/current/static';
+
+
+my $debug_names = 0;
 
 my $pagecache = {};
 
@@ -204,7 +215,7 @@ my $revision = 0;
 my %version_is_eol;
 my $current_column = 0;
 
-my $major_nowraps = '6.0 6.1 6.2 6.3 6.4 7.0 7.1';
+my $major_nowraps = '6.0 6.1 6.2 6.3 6.4 7.0';
 
 my %major_nowrap = map { $_ => 1 } split /\s+/ => $major_nowraps;
 
@@ -575,54 +586,140 @@ Vadim       : Vadim Mikheev
 Vadmin      : Vadim Mikheev
 Vince       : Vince Vielhaber
 Zeugswetter : Andreas Zeugswetter
-Zeugswetter Andres : Andreas Zeugswetter
 
+Zeugswetter Andres : Andreas Zeugswetter
+Melnikov Maksim    : Maksim Melnikov
+Hou Zhijie         : Zhijie Hou
+Ilyasov Ian        : Ian Ilyasov
+Darek Slusarczyk   : Darek Ślusarczyk
+Kuntal Gosh        : Kuntal Ghosh
+Paul Amonson       : Paul D. Amonson
+Xudong Yang        : YANG Xudong
+Kambam Vinay       : Vinay Kambam
+Onder Kalaci       : Önder Kalaci
+Przemyslaw Sztoch  : Przemysław Sztoch
+Zongliang Quan     : Quan Zongliang
+Gunnar Bluth       : Gunnar "Nick" Bluth
 };
 
     ## Contextual hints
     $data =~ s{</h([3456])>}{ (PG $version)</h$1>}sg;
 
+    ## Sanity check on all names
+    if ($opt{nameschanged}) {
+
+        my $contrib = all_contributors();
+
+        my $changes = $data;
+        $changes =~ s{.*Changes</h2><ul>}{GREGFOUND}s;
+        $changes =~ s{\d+ contains a number of changes that may affect}{GREGFOUND}s;
+
+        $changes =~ /GREGFOUND/ or die "Could not find Changes line in $version! $data\n";
+
+        print STDOUT "Scanning version $version\n";
+        my $failures = 0;
+
+        if ($version =~ /\.0$/) {
+            $changes =~ s{\)</p>}{) <a}gs;
+        }
+
+
+## TODO: Scan list of contributors too, cross reference!
+
+#        die substr($changes, 0, 400);
+        while ($changes =~ /\(([^)]+?)\) <a/gs) {
+            my $localnamelist = $1;
+            #next if $localnamelist !~ /Nick/;
+           #print STDOUT "MATCH ($localnamelist)\n";
+            $localnamelist =~ s/with hat tip to //;
+            my $localfail = 0;
+            for my $name (split /, / => $localnamelist) {
+                if (!exists $contrib->{$name}) {
+                    warn "Found unknown name in Changes v$version: $name\n";
+                    $failures++;
+                    $localfail++;
+                }
+                $contrib->{$name}++;
+            }
+            if ($localfail) {
+                #print STDOUT "MATCH ($localnamelist)\n";
+            }
+        }
+
+        if ($failures) {
+            #die "Leaving due to name mismatch\n";
+        }
+    }
+
     my $original_data = $data;
 
     for (split /\n/ => $namelist) {
         next if ! /\w/;
-        die "Invalid line: $_\n" if ! /^([A-Z][\w \?']+?)\s+:\s+([ÁA-Z][\wé\.\-\' ]+?)(\s*:.+)?$/;
+        die "Invalid line: $_\n" if ! /^([A-Z][\w\x{00C3}© \?']+?)\s+:\s+([ÖÁA-Z][\wé\.\-\'\" ]+?)(\s*:.+)?$/;
         my ($short,$long,$extra) = ($1,$2,$3||'');
         my $count = 0;
         $extra =~ s/^\s*:\s*//;
         if ($extra) {
             $extra = qr{$extra};
-            $count += $data =~ s{($extra[\w\d\.\(\) ]+?\([\w ,]*)\Q$short\E([,\)])}{$1$long$2}g;
+            my $changed = $data =~ s{($extra[\w\d\.\(\) ]+?\([\w ,]*)\Q$short\E([,\)])}{$1$long$2}g;
+            $count += $changed;
+            debugname($data, $long, $changed) if $changed;
         }
         else {
-            $count += $data =~ s{(\W)\Q$short\E([,\)])}{$1$long$2}g;
+            my $changed = $data =~ s{(\()\Q$short\E([,\)])}{$1$long$2}g;
+            $count += $changed;
+            debugname($data, $long, $changed) if $changed;
+
             ## Special case for Vadim &amp; Erich
-            $count += $data =~ s{\(\Q$short\E &amp;}{($long &amp;}g;
-            $count += $data =~ s{&amp; \Q$short\E\)}{(&amp; $long)}g;
+            $changed = $data =~ s{\(\Q$short\E &amp;}{($long &amp;}g;
+            $count += $changed;
+            debugname($data, $long, $changed) if $changed;
+
+            $changed = $data =~ s{&amp; \Q$short\E\)}{&amp; $long)}g;
+            $count += $changed;
+            debugname($data, $long, $changed) if $changed;
+
+            $changed = $data =~ s{(, ?)\Q$short\E([\),])}{$1$long$2}g;
+            $count += $changed;
+            debugname($data, $long, $changed) if $changed;
         }
         $namesmatch{$short} += $count;
         $names += $count;
+
     }
+
     ## Gregs:
     for my $string ('8601 format', 'use pager', 'conforming', 'nonstandard ports') {
         my $search = $string =~ s/ /[ \n]/r;
-        $names += $data =~ s/$search \(Greg\)/$string (Greg Sabino Mullane)/;
+        my $changed = $data =~ s/$search \(Greg\)/$string (Greg Sabino Mullane)/;
+        $names += $changed;
+        debugname($data, 'Greg Sabino', $changed) if $changed;
     }
+
     for my $string ('for large values)', 'unnecessarily') {
-        $names += $data =~ s/\Q$string\E\s+\(Greg([,\)])/$string (Greg Stark$1/;
+        my $changed = $data =~ s/\Q$string\E\s+\(Greg([,\)])/$string (Greg Stark$1/;
+        $names += $changed;
+        debugname($data, 'Greg Stark', $changed) if $changed;
     }
     ## Álvaro:
-    $names += $data =~ s/Alvaro/Álvaro/g;
+    my $changed = $data =~ s/Alvaro Herrera/Álvaro Herrera/g;
+    $names += $changed;
+    debugname($data, 'Álvaro', $changed) if $changed;
 
     ## Hans:
-    $names += $data =~ s/Hans-Jurgen Schonig/Hans-Jürgen Schonig/g;
-    $names += $data =~ s/Hans-Juergen/Hans-Jürgen/g;
+    $changed = $data =~ s/Hans-Jurgen Schonig/Hans-Jürgen Schonig/g;
+    $names += $changed;
+    debugname($data, 'Hans-Jürgen', $changed) if $changed;
+
+    $changed = $data =~ s/Hans-Juergen/Hans-Jürgen/g;
+    $names += $changed;
+    debugname($data, 'Hans-Jürgen', $changed) if $changed;
 
     while ($data =~ m{[\(,]([A-Z]\w+)[,\)]}g) {
         my $name = $1;
         next if $name =~ /^SQL|WARN|ERROR|MVCC|OID|NUL|ZONE|EPOCH|GEQO|WAL|WIN|Window|Alpha|Apple|BC|PITR|TIME|BUFFER|GBK|UHC/;
         next if $name =~ /^TM|PL|SSL|XID|V0|ANALYZE|CTE|CV|LRU|MAX|ORM|SJIS|CN|CSV|Czech|JOHAB|ISM|Also|BLOB|SIGKILL|JIT|NOT/;
-        next if $name =~ /^Mojave/;
+        next if $name =~ /^Mojave|VERBOSE|AIO|Bokmål/;
         next if $name =~ /^Taiwan|Mips|However|Japan|Ukrain|Venezuela|Altai|Kaliningrad|Antarctica|Volgograd/;
         next if $name eq 'MauMau' or $name eq 'Fiji' or $name eq 'ViSolve';
         next if $name eq 'Rumko' or $name eq 'Higepon' or $name eq 'Darwin';
@@ -666,7 +763,7 @@ for my $short (sort keys %namesmatch) {
     next if $namesmatch{$short};
     next if $opt{limitversions} or $maxversions;
     print STDOUT "NO MATCH FOR SHORTNAME $short!\n";
-    exit;
+#    exit;
 }
 
 for (sort keys %fail) {
@@ -675,6 +772,16 @@ for (sort keys %fail) {
 warn "Total name misses: $totalfail\n";
 
 print STDOUT "Names changed: $names\n";
+
+
+if ($opt{nameschanged}) {
+    print STDOUT "Debug names found: $debug_names\n";
+    if ($names != $debug_names) {
+        die "FAILED TO MATCH ALL NAMES!\n";
+    }
+}
+
+
 
 print "</body></html>\n";
 select $oldselect;
@@ -690,6 +797,30 @@ if ($opt{'debug-name-diffs'}) {
     close $dfh2;
     my $diff2page = "$bigpage.new";
     warn "Write $diff2page\n";
+}
+
+
+sub debugname {
+
+    my $string = shift;
+    my $regex = shift;
+    my $matches = shift;
+    my $line= (caller)[2];
+
+    return if ! $opt{nameschanged};
+
+    my $NAMECONTEXT = 30;
+
+    if ($string =~ /(.{$NAMECONTEXT}$regex.{$NAMECONTEXT})/s) {
+        my $match = $1;
+        $match =~ s/\n/ /g;
+        print STDOUT "--> Name replace ($matches) for $regex: $match\n";
+        $debug_names += $matches;
+    }
+    else {
+        print STDOUT "Failed to find name change for $regex ($matches) line=$line\n";
+    }
+    return;
 }
 
 
@@ -721,13 +852,13 @@ sub fetch_page {
 
     if (-e $file and ! $skipcache) {
         $verbose and print "Using cached file $file\n";
-        open my $fh, '<', $file or die qq{Could not open "$file": $!\n};
+        open my $fh, '<:encoding(UTF-8)', $file or die qq{Could not open "$file": $!\n};
         my $data; { local $/; $data = <$fh>; } ## no critic (Variables::RequireInitializationForLocalVars)
         close $fh;
         return $data;
     }
 
-    $verbose and print "Fetching file $file\n";
+    $verbose and print "Fetching file $file via $page\n";
 
     my $req = HTTP::Request->new(GET => $page);
     my $res = $ua->request($req);
@@ -735,8 +866,8 @@ sub fetch_page {
     $res->is_success
         or die "FAILED to fetch $page: " . $res->status_line . "\n";
 
-    open my $fh, '>', $file or die qq{Could not write "$file": $!\n};
-    my $data = $res->content;
+    open my $fh, '>:encoding(UTF-8)', $file or die qq{Could not write "$file": $!\n};
+    my $data = decode('UTF-8', $res->decoded_content(charset => 'none'));
     print {$fh} $data;
     close $fh;
 
@@ -799,3 +930,18 @@ push @list => $_ for (grep /\w/ => split /\n/ => $author_list);
 return \@list;
 
 } ## end of original_authors
+
+sub all_contributors {
+
+    ## A complete list of all contributor, used to help debug the name replacements
+
+my $author_list = '
+Tom Lane
+';
+## TODO: Put this back in
+
+
+my %list = map{s/ +#.*//; $_, 0 } grep /\w/ => split /\n/ => $author_list;
+return \%list;
+
+} ## end of all_contributors
