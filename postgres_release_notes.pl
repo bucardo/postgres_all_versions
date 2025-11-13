@@ -627,14 +627,8 @@ Gunnar Bluth       : Gunnar "Nick" Bluth
             $changes =~ s{\)</p>}{) <a}gs;
         }
 
-
-## TODO: Scan list of contributors too, cross reference!
-
-#        die substr($changes, 0, 400);
         while ($changes =~ /\(([^)]+?)\) <a/gs) {
             my $localnamelist = $1;
-            #next if $localnamelist !~ /Nick/;
-           #print STDOUT "MATCH ($localnamelist)\n";
             $localnamelist =~ s/with hat tip to //;
             my $localfail = 0;
             for my $name (split /, / => $localnamelist) {
@@ -695,7 +689,7 @@ Gunnar Bluth       : Gunnar "Nick" Bluth
     ## Gregs:
     for my $string ('8601 format', 'use pager', 'conforming', 'nonstandard ports') {
         my $search = $string =~ s/ /[ \n]/r;
-        my $changed = $data =~ s/$search \(Greg\)/$string (Greg Sabino Mullane)/;
+        my $changed = $data =~ s/$search\s+\(Greg\)/$string (Greg Sabino Mullane)/;
         $names += $changed;
         debugname($data, 'Greg Sabino', $changed) if $changed;
     }
@@ -731,6 +725,9 @@ Gunnar Bluth       : Gunnar "Nick" Bluth
         next if $name eq 'Alternatively' or $name eq 'Kerberos';
         next if $name eq 'VaibhaveS';
         $fail{$name}++;
+        if ($verbose) {
+            print STDERR "Added $name for $version\n";
+        }
         $totalfail++;
     }
 
@@ -767,7 +764,6 @@ for my $short (sort keys %namesmatch) {
     next if $namesmatch{$short};
     next if $opt{limitversions} or $maxversions;
     print STDOUT "NO MATCH FOR SHORTNAME $short!\n";
-#    exit;
 }
 
 for (sort keys %fail) {
