@@ -11,7 +11,7 @@ use utf8; binmode(STDOUT, ":encoding(UTF-8)");
 use open ':std', ':encoding(UTF-8)';
 use 5.24.0;
 
-our $VERSION = '1.40';
+our $VERSION = '1.41';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
