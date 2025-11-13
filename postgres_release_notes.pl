@@ -604,6 +604,10 @@ Onder Kalaci       : Önder Kalaci
 Przemyslaw Sztoch  : Przemysław Sztoch
 Zongliang Quan     : Quan Zongliang
 Gunnar Bluth       : Gunnar "Nick" Bluth
+
+wuchengwen         : Chengwen Wu
+Sunil S            : Sunil Seetharama
+
 };
 
     ## Contextual hints
@@ -653,7 +657,7 @@ Gunnar Bluth       : Gunnar "Nick" Bluth
 
     for (split /\n/ => $namelist) {
         next if ! /\w/;
-        die "Invalid line: $_\n" if ! /^([A-Z][\w\x{00C3}© \?']+?)\s+:\s+([ÖÁA-Z][\wé\.\-\'\" ]+?)(\s*:.+)?$/;
+        die "Invalid line: $_\n" if ! /^([A-Zw][\w\x{00C3}© \?']+?)\s+:\s+([ÖÁA-Z][\wé\.\-\'\" ]+?)(\s*:.+)?$/;
         my ($short,$long,$extra) = ($1,$2,$3||'');
         my $count = 0;
         $extra =~ s/^\s*:\s*//;
