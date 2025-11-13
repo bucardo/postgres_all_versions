@@ -19,6 +19,10 @@ my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 ## --verbosenames = Show which names got changed
 ## --debug-tableonly = Just the top HTML TOC
 
+my $RATELIMIT = 3;
+my $RATELIMITSLEEP = 0.5;
+my $PAGES_FETCHED = 0;
+
 my $PG_DUMP_URL = 'https://www.postgresql.org/docs/current/app-pgdump.html';
 
 my $GREG_URL = 'https://www.linkedin.com/in/abcde/';
@@ -362,7 +366,7 @@ for my $row (@pagelist) {
     ## Remove the new helper tags
     $data =~ s{ <a href="#(.+?)">#</a>}{}gsm;
 
-    $data =~ s{.*(<p>(<strong>|<b>)Release date)}{$1}s
+    $data =~ s{.*(<p>(<strong>|<b>)Release date)}{$1}si
         or die "No release date found for $url\n";
 
     $data =~ s{<div[^>]+class="navfooter">.*}{}is;
@@ -859,6 +863,10 @@ sub fetch_page {
     }
 
     $verbose and print "Fetching file $file via $page\n";
+
+    if ($PAGES_FETCHED++ >= $RATELIMIT) {
+        sleep $RATELIMITSLEEP;
+    }
 
     my $req = HTTP::Request->new(GET => $page);
     my $res = $ua->request($req);
