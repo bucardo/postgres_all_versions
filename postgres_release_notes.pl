@@ -460,7 +460,7 @@ for my $row (@pagelist) {
     my $mitre = 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=';
     my $redhat = 'https://access.redhat.com/security/cve';
 
-    $data =~ s{([^-])(CVE-[\d\-]+)}{$1<a href="$mitre$2">$2</a> or <a href="$redhat/$2">$2</a>}g;
+    $data =~ s{([^-])(CVE-[\d\-]+)}{$1<a href="$mitre$2" target="_blank">$2</a> or <a href="$redhat/$2" target="_blank">$2</a>}g;
 
     ## Put spaces before some parens
     $data =~ s{(...\w)\(([A-Z]...)}{$1 ($2}g;
