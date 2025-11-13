@@ -31,8 +31,8 @@ my $BEST_VERSION_COLOR = '#000800';
 
 my $COLS = 6;
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
-my $EOL = '12';
-my $EOLSOON = '13';
+my $EOL = '13';
+my $EOLSOON = '99';
 my $CURRENT_VERSION = 18;
 my $EOLDATES = q{
 18 November 14, 2030
@@ -460,7 +460,7 @@ for my $row (@pagelist) {
     my $mitre = 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=';
     my $redhat = 'https://access.redhat.com/security/cve';
 
-    $data =~ s{[^-](CVE-[\d\-]+)}{<a href="$mitre$1">$1</a> or <a href="$redhat/$1">$1</a>}g;
+    $data =~ s{([^-])(CVE-[\d\-]+)}{$1<a href="$mitre$2">$2</a> or <a href="$redhat/$2">$2</a>}g;
 
     ## Put spaces before some parens
     $data =~ s{(...\w)\(([A-Z]...)}{$1 ($2}g;
