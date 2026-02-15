@@ -11,7 +11,7 @@ use utf8; binmode(STDOUT, ":encoding(UTF-8)");
 use open ':std', ':encoding(UTF-8)';
 use 5.24.0;
 
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -125,11 +125,11 @@ a { white-space: nowrap }
 span.gsm_v { color: #990000; font-family: monospace }
 table.gsm { border-collapse: collapse; border-spacing: 15px }
 table.gsm td { border: 1px solid #000; padding: 5px 7px 10px 7px; vertical-align: top; white-space: nowrap }
-table.gsm td.eol { font-size: x-small; font-family: monospace }
+table.gsm td.eol { font-size: small; font-family: monospace }
 table.gsm td.eol span { color: #dd0000 }
 table.gsm td.eolsoon { font-size: small; font-family: monospace }
 table.gsm td.eolsoon span { color: #ff9900 }
-table.gsm td.notdeadyet { font-size: small; }
+table.gsm td.notdeadyet { font-size: medium; }
 table.gsm td.notdeadyet span { color: #339900 }
 span.gsmt { font-family: serif !important; color: black !important; font-weight: bolder !important }
 code { font-weight: bolder }
