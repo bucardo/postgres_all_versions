@@ -11,7 +11,7 @@ use utf8; binmode(STDOUT, ":encoding(UTF-8)");
 use open ':std', ':encoding(UTF-8)';
 use 5.24.0;
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -219,7 +219,7 @@ my $revision = 0;
 my %version_is_eol;
 my $current_column = 0;
 
-my $major_nowraps = '6.0 6.1 6.2 6.3 6.4 7.0';
+my $major_nowraps = '6.0 6.1';
 
 my %major_nowrap = map { $_ => 1 } split /\s+/ => $major_nowraps;
 
@@ -319,8 +319,8 @@ for my $row (@pagelist) {
         else {
             printf '<td%s%s>',
             $span > 1 ? " colspan=$span" : '',
-              $major == $EOLSOON ? ' class="eolsoon" ' :
-                $major <= $EOL ? ' class="eol"' : ' class="notdeadyet"';
+            $major == $EOLSOON ? ' class="eolsoon" ' :
+            $major <= $EOL ? ' class="eol"' : ' class="notdeadyet"';
         }
         printf "<span class='gsmt'>Postgres %s%s</span>\n",
           $showver,
