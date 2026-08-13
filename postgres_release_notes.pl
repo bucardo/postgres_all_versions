@@ -11,7 +11,7 @@ use utf8; binmode(STDOUT, ":encoding(UTF-8)");
 use open ':std', ':encoding(UTF-8)';
 use 5.24.0;
 
-our $VERSION = '1.43';
+our $VERSION = '1.44';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -32,8 +32,11 @@ my $BEST_VERSION_COLOR = '#000800';
 my $COLS = 6;
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '13';
-my $EOLSOON = '99';
+my $EOLSOON = '14';
 my $CURRENT_VERSION = 18;
+
+my $NEVER_RELEASED = '18.5';
+
 my $EOLDATES = q{
 18 November 14, 2030
 17 November 8, 2029
@@ -161,6 +164,14 @@ while ($content =~ m{a href="/docs/release/(\d+)([\d\.]+?)/"}gs) {
     my $version = "$v1$v2";
     $verbose and warn "Found version $version\n";
     next if $v1 > $CURRENT_VERSION;
+
+    if ($NEVER_RELEASED =~ /\b$version\b/) {
+        $versiondate{$version} = 'never released';
+	push @pagelist => ['NONE', $version, 'NONE'];
+        $verbose and warn "Version $version never released\n";
+        next;
+    }
+
     my $pageurl = "$index$version/";
 	my $pageinfo = fetch_page($pageurl);
 	$total++;
@@ -225,8 +236,11 @@ my %major_nowrap = map { $_ => 1 } split /\s+/ => $major_nowraps;
 
 my %in_left_column;
 
+my $norelease = '<em>never released!</em>';
+
 for my $row (@pagelist) {
 
+    my $pageurl = $row->[0];
     my $version = $row->[1];
 
     my $major = 0;
@@ -334,11 +348,17 @@ for my $row (@pagelist) {
         $tooltip = "Release notes for major version $major";
     }
 
+    if ($pageurl eq 'NONE') {
+        ## Not released, AND no release page
+        printf qq{<br>%s (%s)\n}, $version, $norelease;
+        next;
+    }
+
     printf qq{<br><a class='%s' data-tooltip='%s' %shref="#version_%s">%s</a> (%s)\n},
       $tooltip_class, $tooltip, ($major > $EOL and $startcell) ? 'class="bv" ' : '',
         $version,
             ( ($revision>=1 or $major <= 6) ? $version : qq{<b>$version</b>}),
-                $versiondate{$version} =~ /never/ ? '<em>never released!</em>' : "$versiondate{$version}";
+                $versiondate{$version} =~ /never/ ? $norelease : "$versiondate{$version}";
     $oldmajor = $major;
 }
 
@@ -360,6 +380,8 @@ for my $row (@pagelist) {
     my ($url,$version,$data) = @$row;
 
     next if $opt{limitversions} and $version !~ /^$opt{limitversions}/;
+
+    next if $data eq 'NONE';
 
     ## Much of this changes from version to version
 
@@ -728,6 +750,7 @@ Sunil S            : Sunil Seetharama
         next if $name eq 'Simplified' or $name eq 'RLS' or $name eq 'OS';
         next if $name eq 'Alternatively' or $name eq 'Kerberos';
         next if $name eq 'VaibhaveS';
+        next if $name eq 'TBASE';
         $fail{$name}++;
         if ($verbose) {
             print STDERR "Added $name for $version\n";
