@@ -11,7 +11,7 @@ use utf8; binmode(STDOUT, ":encoding(UTF-8)");
 use open ':std', ':encoding(UTF-8)';
 use 5.24.0;
 
-our $VERSION = '1.44';
+our $VERSION = '1.45';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -31,7 +31,7 @@ my $BEST_VERSION_COLOR = '#000800';
 
 my $COLS = 6;
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
-my $EOL = '13';
+my $EOL = '14';
 my $EOLSOON = '14';
 my $CURRENT_VERSION = 18;
 
@@ -173,17 +173,17 @@ while ($content =~ m{a href="/docs/release/(\d+)([\d\.]+?)/"}gs) {
     }
 
     my $pageurl = "$index$version/";
-	my $pageinfo = fetch_page($pageurl);
-	$total++;
+    my $pageinfo = fetch_page($pageurl);
+    $total++;
 
-	push @pagelist => [$pageurl, $version, $pageinfo];
+    push @pagelist => [$pageurl, $version, $pageinfo];
 
-	while ($pageinfo =~ m{<li>\s*<p>(.+?)</li>}sg) {
-		my $blurb = $1;
-		push @{$bullet{$blurb}} => $version;
-	}
+    while ($pageinfo =~ m{<li>\s*<p>(.+?)</li>}sg) {
+        my $blurb = $1;
+        push @{$bullet{$blurb}} => $version;
+    }
 
-	## Gather the release date for each version
+    ## Gather the release date for each version
 
     my $founddate = 0;
     if ($pageinfo =~ /Release [Dd]ate:\D+(\d\d\d\d\-\d\d\-\d\d)/) {
@@ -333,8 +333,9 @@ for my $row (@pagelist) {
         else {
             printf '<td%s%s>',
             $span > 1 ? " colspan=$span" : '',
+            $major <= $EOL ? ' class="eol"' :
             $major == $EOLSOON ? ' class="eolsoon" ' :
-            $major <= $EOL ? ' class="eol"' : ' class="notdeadyet"';
+            ' class="notdeadyet"';
         }
         printf "<span class='gsmt'>Postgres %s%s</span>\n",
           $showver,
