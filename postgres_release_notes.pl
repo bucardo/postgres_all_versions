@@ -231,7 +231,7 @@ my $revision = 0;
 my %version_is_eol;
 my $current_column = 0;
 
-my $major_nowraps = '6.0 6.1';
+my $major_nowraps = '6.0 6.1 6.3';
 
 my %major_nowrap = map { $_ => 1 } split /\s+/ => $major_nowraps;
 
