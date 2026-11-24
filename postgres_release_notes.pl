@@ -11,7 +11,7 @@ use utf8; binmode(STDOUT, ":encoding(UTF-8)");
 use open ':std', ':encoding(UTF-8)';
 use 5.24.0;
 
-our $VERSION = '1.45';
+our $VERSION = '1.46';
 
 my $USAGE = "$0 [--noindexcache] [--nocache] [--verbose]";
 
@@ -32,12 +32,13 @@ my $BEST_VERSION_COLOR = '#000800';
 my $COLS = 6;
 my $EOLURL = 'https://www.postgresql.org/support/versioning/';
 my $EOL = '14';
-my $EOLSOON = '14';
-my $CURRENT_VERSION = 18;
+my $EOLSOON = '15';
+my $CURRENT_VERSION = 19;
 
 my $NEVER_RELEASED = '18.5';
 
 my $EOLDATES = q{
+19 November 19, 2031
 18 November 14, 2030
 17 November 8, 2029
 16 November 9, 2028
@@ -746,12 +747,13 @@ Sunil S            : Sunil Seetharama
         next if $name =~ /^TM|PL|SSL|XID|V0|ANALYZE|CTE|CV|LRU|MAX|ORM|SJIS|CN|CSV|Czech|JOHAB|ISM|Also|BLOB|SIGKILL|JIT|NOT/;
         next if $name =~ /^Mojave|VERBOSE|AIO|Bokmål/;
         next if $name =~ /^Taiwan|Mips|However|Japan|Ukrain|Venezuela|Altai|Kaliningrad|Antarctica|Volgograd/;
-        next if $name eq 'MauMau' or $name eq 'Fiji' or $name eq 'ViSolve';
+        next if $name eq 'MauMau' or $name eq 'Fiji' or $name eq 'ViSolve' or $name eq 'Ke';
         next if $name eq 'Rumko' or $name eq 'Higepon' or $name eq 'Darwin';
         next if $name eq 'Simplified' or $name eq 'RLS' or $name eq 'OS';
         next if $name eq 'Alternatively' or $name eq 'Kerberos';
         next if $name eq 'VaibhaveS';
         next if $name eq 'TBASE';
+        next if $name eq 'CONCURRENTLY';
         $fail{$name}++;
         if ($verbose) {
             print STDERR "Added $name for $version\n";
